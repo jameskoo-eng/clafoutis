@@ -33,9 +33,9 @@ describe('getWorkflowTemplate', () => {
     expect(template).toContain('actions/setup-node@v4');
   });
 
-  it('installs clafoutis globally', () => {
+  it('installs clafoutis as dev dependency', () => {
     const template = getWorkflowTemplate();
-    expect(template).toContain('npm install -g clafoutis');
+    expect(template).toContain('npm install -D clafoutis');
   });
 
   it('runs generate command', () => {
@@ -50,16 +50,17 @@ describe('getWorkflowTemplate', () => {
 
   it('computes next semver version from git tags', () => {
     const template = getWorkflowTemplate();
-    expect(template).toContain('git fetch --tags');
-    expect(template).toContain("git tag -l 'v[0-9]*.[0-9]*.[0-9]*'");
+    expect(template).toContain('fetch-depth: 0');
+    expect(template).toContain("git tag -l 'v*'");
     expect(template).toContain('sort -V');
-    expect(template).toContain('NEXT_VERSION="v1.0.0"');
-    expect(template).toContain('NEXT_PATCH=$((PATCH + 1))');
+    expect(template).toContain('echo "version=1.0.0"');
+    expect(template).toContain('PATCH=$((PATCH + 1))');
   });
 
-  it('uploads build artifacts', () => {
+  it('prepares release assets with collision detection', () => {
     const template = getWorkflowTemplate();
-    expect(template).toContain('build/**/*');
+    expect(template).toContain('release-assets/*');
+    expect(template).toContain('Collision detected');
   });
 });
 

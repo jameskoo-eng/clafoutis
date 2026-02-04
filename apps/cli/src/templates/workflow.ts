@@ -19,49 +19,53 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Clafoutis
-        run: npm install -g clafoutis
+        run: npm install -D clafoutis
 
       - name: Generate tokens
-        run: clafoutis generate
+        run: npx clafoutis generate
 
       - name: Get next version
         id: version
         run: |
-          # Fetch all tags
-          git fetch --tags
-
-          # Get the latest semver tag (vX.Y.Z format), default to v0.0.0 if none exist
-          LATEST_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n 1)
-
-          if [ -z "$LATEST_TAG" ]; then
-            NEXT_VERSION="v1.0.0"
+          LATEST=$(git tag -l 'v*' | grep -E '^v[0-9]+\\.[0-9]+\\.[0-9]+$' | sort -V | tail -n1)
+          if [ -z "$LATEST" ]; then
+            echo "version=1.0.0" >> $GITHUB_OUTPUT
           else
-            # Extract major.minor.patch and increment patch
-            VERSION=\${LATEST_TAG#v}
-            MAJOR=$(echo $VERSION | cut -d. -f1)
-            MINOR=$(echo $VERSION | cut -d. -f2)
-            PATCH=$(echo $VERSION | cut -d. -f3)
-            NEXT_PATCH=$((PATCH + 1))
-            NEXT_VERSION="v$MAJOR.$MINOR.$NEXT_PATCH"
+            VERSION=\${LATEST#v}
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+            PATCH=$((PATCH + 1))
+            echo "version=\${MAJOR}.\${MINOR}.\${PATCH}" >> $GITHUB_OUTPUT
           fi
 
-          echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
-          echo "Next version: $NEXT_VERSION"
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          while IFS= read -r -d '' file; do
+            relative="\${file#build/}"
+            flat_name="\${relative//\\//.}"
+            target="release-assets/$flat_name"
+            if [ -e "$target" ]; then
+              echo "::error::Collision detected: '$relative' flattens to '$flat_name' which already exists"
+              exit 1
+            fi
+            cp "$file" "$target"
+          done < <(find build -type f -print0)
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: \${{ steps.version.outputs.version }}
-          name: Design Tokens \${{ steps.version.outputs.version }}
+          tag_name: v\${{ steps.version.outputs.version }}
+          name: Design Tokens v\${{ steps.version.outputs.version }}
           generate_release_notes: true
-          files: |
-            build/**/*
+          files: release-assets/*
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 `;

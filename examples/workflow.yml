@@ -57,7 +57,12 @@ jobs:
           while IFS= read -r -d '' file; do
             relative="${file#build/}"
             flat_name="${relative//\//.}"
-            cp "$file" "release-assets/$flat_name"
+            target="release-assets/$flat_name"
+            if [ -e "$target" ]; then
+              echo "::error::Collision detected: '$relative' flattens to '$flat_name' which already exists"
+              exit 1
+            fi
+            cp "$file" "$target"
           done < <(find build -type f -print0)
 
       - name: Create Release
