@@ -72,6 +72,10 @@ git add .clafoutis/ src/tokens/
 git commit -m "chore: add design tokens"
 ```
 
+### Private Repository Access
+
+See [Token Distribution Guide](docs/distribution/README.md#private-repositories) for setting up access to private design system repos.
+
 ## CLI Commands 💻
 
 ### `clafoutis generate`
@@ -104,7 +108,7 @@ Options:
 
 ### `clafoutis init`
 
-Initialize Clafoutis configuration.
+Initialize Clafoutis configuration. When run without flags in an interactive terminal, an interactive wizard guides you through the setup.
 
 ```bash
 npx clafoutis init [options]
@@ -113,6 +117,36 @@ Options:
   --producer           Set up as a design token producer
   --consumer           Set up as a design token consumer
   -r, --repo <repo>    GitHub repo for consumer mode (org/name)
+  -t, --tokens <path>  Token directory path (default: ./tokens)
+  -o, --output <path>  Output directory path (default: ./build)
+  -g, --generators <list>  Comma-separated generators: tailwind, figma
+  --workflow           Create GitHub Actions workflow (default: true)
+  --no-workflow        Skip GitHub Actions workflow
+  --files <mapping>    File mappings for consumer: asset:dest,asset:dest
+  --force              Overwrite existing configuration
+  --dry-run            Preview changes without writing files
+  --non-interactive    Skip prompts, use defaults or flags
+```
+
+**Interactive Wizard:**
+
+Running `npx clafoutis init` without arguments launches an interactive wizard that guides you through:
+
+- Selecting producer or consumer mode
+- Choosing generators (Tailwind, Figma)
+- Setting token and output directories
+- Creating GitHub Actions workflows
+
+**Non-Interactive Mode (CI/CD):**
+
+For automation, use `--non-interactive` with explicit flags:
+
+```bash
+# Producer setup in CI
+npx clafoutis init --producer --generators=tailwind,figma --tokens=./tokens --output=./build --non-interactive
+
+# Consumer setup in CI
+npx clafoutis init --consumer --repo=Acme/design-system --files=tailwind.base.css:./src/styles/base.css --non-interactive
 ```
 
 ## Configuration ⚙️
@@ -140,15 +174,19 @@ Options:
     "scss._colors.scss": "src/tokens/_colors.scss",
     "scss._typography.scss": "src/tokens/_typography.scss",
     "tailwind.config.js": "./tailwind.config.js"
-  }
+  },
+  "postSync": "npx prettier --write ./src/tokens/"
 }
 ```
 
 - `repo`: GitHub repository in `org/name` format
-- `version`: Release tag to sync (e.g., `v1.0.0`)
+- `version`: Release tag to sync (e.g., `v1.0.0`) or `"latest"`
 - `files`: Mapping of release asset names to local file paths
+- `postSync`: (Optional) Command to run after syncing files
 
 Asset names are flattened from the build directory (e.g., `build/scss/_colors.scss` becomes `scss._colors.scss`).
+
+Example configurations are available in [`apps/cli/examples/`](apps/cli/examples/).
 
 ## Custom Generators 🔧
 

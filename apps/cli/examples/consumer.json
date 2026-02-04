@@ -1,0 +1,9 @@
+{
+  "repo": "Acme/design-system",
+  "version": "latest",
+  "files": {
+    "tailwind.base.css": "./src/styles/base.css",
+    "tailwind.config.js": "./tailwind.config.js"
+  },
+  "postSync": "npx prettier --write ./src/styles/base.css"
+}

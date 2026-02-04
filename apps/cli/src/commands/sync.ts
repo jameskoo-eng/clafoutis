@@ -3,12 +3,14 @@ import { exec } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 
+import { offerWizard } from '../cli/wizard.js';
 import type { ClafoutisConfig } from '../types.js';
 import { readCache, writeCache } from '../utils/cache.js';
 import { fileExists, readConfig } from '../utils/config.js';
 import { ClafoutisError, configNotFoundError } from '../utils/errors.js';
 import { downloadRelease } from '../utils/github.js';
 import { validateConsumerConfig } from '../utils/validate.js';
+import { initCommand } from './init.js';
 
 interface SyncOptions {
   force?: boolean;
@@ -40,7 +42,7 @@ async function writeOutput(
 export async function syncCommand(options: SyncOptions): Promise<void> {
   const configPath = options.config || '.clafoutis/consumer.json';
 
-  const config = await readConfig(configPath);
+  let config = await readConfig(configPath);
   if (!config) {
     if (await fileExists(configPath)) {
       throw new ClafoutisError(
@@ -49,7 +51,21 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
         'Ensure the file contains valid JSON'
       );
     }
-    throw configNotFoundError(configPath, true);
+
+    if (process.stdin.isTTY) {
+      const shouldRunWizard = await offerWizard('consumer');
+      if (shouldRunWizard) {
+        await initCommand({ consumer: true });
+        config = await readConfig(configPath);
+        if (!config) {
+          throw configNotFoundError(configPath, true);
+        }
+      } else {
+        throw configNotFoundError(configPath, true);
+      }
+    } else {
+      throw configNotFoundError(configPath, true);
+    }
   }
 
   validateConsumerConfig(config);

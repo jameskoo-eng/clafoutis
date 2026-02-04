@@ -3,6 +3,7 @@ import path from 'path';
 import StyleDictionary from 'style-dictionary';
 import { pathToFileURL } from 'url';
 
+import { offerWizard } from '../cli/wizard.js';
 import type { GeneratorContext, GeneratorPlugin } from '../types.js';
 import { fileExists, readProducerConfig } from '../utils/config.js';
 import {
@@ -13,6 +14,7 @@ import {
   tokensDirNotFoundError,
 } from '../utils/errors.js';
 import { validateProducerConfig } from '../utils/validate.js';
+import { initCommand } from './init.js';
 
 interface GenerateOptions {
   config?: string;
@@ -58,7 +60,21 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
         'Ensure the file contains valid JSON'
       );
     }
-    throw configNotFoundError(configPath, false);
+
+    if (process.stdin.isTTY) {
+      const shouldRunWizard = await offerWizard('producer');
+      if (shouldRunWizard) {
+        await initCommand({ producer: true });
+        config = await readProducerConfig(configPath);
+        if (!config) {
+          throw configNotFoundError(configPath, false);
+        }
+      } else {
+        throw configNotFoundError(configPath, false);
+      }
+    } else {
+      throw configNotFoundError(configPath, false);
+    }
   }
 
   validateProducerConfig(config);

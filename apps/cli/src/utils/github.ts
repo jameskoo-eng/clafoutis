@@ -20,7 +20,7 @@ interface GitHubRelease {
 export async function downloadRelease(
   config: ClafoutisConfig
 ): Promise<Map<string, string>> {
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.CLAFOUTIS_REPO_TOKEN;
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'clafoutis-cli',

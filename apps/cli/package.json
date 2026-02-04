@@ -33,6 +33,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@clack/prompts": "^1.0.0",
     "@clafoutis/shared": "workspace:*",
     "@clafoutis/generators": "workspace:*",
     "ajv": "^8.12.0",

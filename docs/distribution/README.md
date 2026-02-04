@@ -330,10 +330,10 @@ Add to .gitignore:
 
 ## Private Repositories
 
-For private repositories, set the `GITHUB_TOKEN` environment variable:
+For private repositories, set the `CLAFOUTIS_REPO_TOKEN` environment variable with a GitHub classic PAT that has `repo` scope:
 
 ```bash
-export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+export CLAFOUTIS_REPO_TOKEN=ghp_xxxxxxxxxxxx
 npx clafoutis sync
 ```
 
@@ -342,8 +342,10 @@ In CI, use a secret:
 ```yaml
 - run: npx clafoutis sync
   env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    CLAFOUTIS_REPO_TOKEN: ${{ secrets.CLAFOUTIS_REPO_TOKEN }}
 ```
+
+**Note:** GitHub classic PATs are required (not fine-grained tokens). Create one at GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic).
 
 ---
 
@@ -364,12 +366,12 @@ Verify the version exists in your design system repo's releases.
 
 ```
 Error: Authentication required
-GITHUB_TOKEN is required for private repositories
+CLAFOUTIS_REPO_TOKEN is required for private repositories
 
-Suggestion: Set the environment variable: export GITHUB_TOKEN=ghp_xxx
+Suggestion: Set the environment variable: export CLAFOUTIS_REPO_TOKEN=ghp_xxx
 ```
 
-Create a GitHub personal access token with `repo` scope and set it as `GITHUB_TOKEN`.
+Create a GitHub classic PAT with `repo` scope and set it as `CLAFOUTIS_REPO_TOKEN`.
 
 ### Config not found
 

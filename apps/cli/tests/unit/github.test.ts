@@ -105,8 +105,8 @@ describe('downloadRelease', () => {
     expect(files.get('_typography.scss')).toBe('$text: #1f2937;');
   });
 
-  it('includes authorization header when GITHUB_TOKEN is set', async () => {
-    process.env.GITHUB_TOKEN = 'test-token';
+  it('includes authorization header when CLAFOUTIS_REPO_TOKEN is set', async () => {
+    process.env.CLAFOUTIS_REPO_TOKEN = 'test-token';
 
     const mockRelease = { assets: [] };
     vi.mocked(fetch).mockResolvedValueOnce({
@@ -131,6 +131,6 @@ describe('downloadRelease', () => {
       })
     );
 
-    delete process.env.GITHUB_TOKEN;
+    delete process.env.CLAFOUTIS_REPO_TOKEN;
   });
 });

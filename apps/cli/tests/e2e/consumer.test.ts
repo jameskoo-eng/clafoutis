@@ -36,12 +36,13 @@ describe('Consumer E2E', () => {
     expect(config.repo).toBe('test/repo');
   });
 
-  it('init --consumer uses default repo when not provided', async () => {
-    execSync(`node ${cliBin} init --consumer`, { cwd: tempDir, stdio: 'pipe' });
-
-    const configPath = path.join(tempDir, '.clafoutis/consumer.json');
-    const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
-    expect(config.repo).toBe('YourOrg/design-system');
+  it('init --consumer requires --repo in non-interactive mode', async () => {
+    expect(() => {
+      execSync(`node ${cliBin} init --consumer`, {
+        cwd: tempDir,
+        stdio: 'pipe',
+      });
+    }).toThrow();
   });
 
   it('sync --dry-run does not download or write files', async () => {

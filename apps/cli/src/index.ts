@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import * as p from '@clack/prompts';
 import { Command } from 'commander';
 
 import { generateCommand } from './commands/generate.js';
@@ -7,6 +8,21 @@ import { syncCommand } from './commands/sync.js';
 import { ClafoutisError } from './utils/errors.js';
 
 const program = new Command();
+
+/**
+ * Formats and displays an error using @clack/prompts styling when in TTY,
+ * otherwise falls back to plain text formatting.
+ */
+function displayError(err: ClafoutisError): void {
+  if (process.stdin.isTTY) {
+    p.log.error(`${err.title}: ${err.detail}`);
+    if (err.suggestion) {
+      p.log.info(`Suggestion: ${err.suggestion}`);
+    }
+  } else {
+    console.error(err.format());
+  }
+}
 
 /**
  * Wraps a command action with error handling for ClafoutisError instances.
@@ -19,7 +35,7 @@ function withErrorHandling<T>(
       await fn(options);
     } catch (err) {
       if (err instanceof ClafoutisError) {
-        console.error(err.format());
+        displayError(err);
         process.exit(1);
       }
       throw err;
@@ -29,12 +45,19 @@ function withErrorHandling<T>(
 
 process.on('uncaughtException', err => {
   if (err instanceof ClafoutisError) {
-    console.error(err.format());
+    displayError(err);
   } else {
-    console.error(`\nUnexpected error: ${err.message}\n`);
-    console.error(
-      'Please report this issue at: https://github.com/Dessert-Labs/clafoutis/issues'
-    );
+    if (process.stdin.isTTY) {
+      p.log.error(`Unexpected error: ${err.message}`);
+      p.log.info(
+        'Please report this issue at: https://github.com/Dessert-Labs/clafoutis/issues'
+      );
+    } else {
+      console.error(`\nUnexpected error: ${err.message}\n`);
+      console.error(
+        'Please report this issue at: https://github.com/Dessert-Labs/clafoutis/issues'
+      );
+    }
   }
   process.exit(1);
 });
@@ -76,6 +99,21 @@ program
   .option('--producer', 'Set up as a design token producer')
   .option('--consumer', 'Set up as a design token consumer')
   .option('-r, --repo <repo>', 'GitHub repo for consumer mode (org/name)')
+  .option('-t, --tokens <path>', 'Token directory path (default: ./tokens)')
+  .option('-o, --output <path>', 'Output directory path (default: ./build)')
+  .option(
+    '-g, --generators <list>',
+    'Comma-separated generators: tailwind, figma'
+  )
+  .option('--workflow', 'Create GitHub Actions workflow (default: true)')
+  .option('--no-workflow', 'Skip GitHub Actions workflow')
+  .option(
+    '--files <mapping>',
+    'File mappings for consumer: asset:dest,asset:dest'
+  )
+  .option('--force', 'Overwrite existing configuration')
+  .option('--dry-run', 'Preview changes without writing files')
+  .option('--non-interactive', 'Skip prompts, use defaults or flags')
   .action(withErrorHandling(initCommand));
 
 program.parse();

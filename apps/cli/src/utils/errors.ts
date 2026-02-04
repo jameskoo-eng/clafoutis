@@ -79,8 +79,8 @@ export function releaseNotFoundError(
 export function authRequiredError(): ClafoutisError {
   return new ClafoutisError(
     'Authentication required',
-    'GITHUB_TOKEN is required for private repositories',
-    'Set the environment variable: export GITHUB_TOKEN=ghp_xxx'
+    'CLAFOUTIS_REPO_TOKEN is required for private repositories',
+    'Set the environment variable: export CLAFOUTIS_REPO_TOKEN=ghp_xxx'
   );
 }
 
@@ -117,5 +117,38 @@ export function tokensDirNotFoundError(tokensDir: string): ClafoutisError {
     'Tokens directory not found',
     `Directory "${tokensDir}" does not exist`,
     'Create the directory and add token JSON files'
+  );
+}
+
+/**
+ * Creates a ClafoutisError for when a config file already exists.
+ */
+export function configExistsError(configPath: string): ClafoutisError {
+  return new ClafoutisError(
+    'Configuration already exists',
+    configPath,
+    'Use --force to overwrite the existing configuration'
+  );
+}
+
+/**
+ * Creates a ClafoutisError for network/fetch failures.
+ */
+export function networkError(url: string, reason: string): ClafoutisError {
+  return new ClafoutisError(
+    'Network error',
+    `Failed to fetch ${url}: ${reason}`,
+    'Check your network connection and ensure the repository is accessible'
+  );
+}
+
+/**
+ * Creates a ClafoutisError for invalid CLI flag combinations.
+ */
+export function invalidFlagsError(errors: string[]): ClafoutisError {
+  return new ClafoutisError(
+    'Invalid flags',
+    errors.join('\n'),
+    'Fix the invalid flags and try again'
   );
 }

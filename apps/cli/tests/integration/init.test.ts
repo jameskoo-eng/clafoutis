@@ -19,31 +19,42 @@ describe('initCommand', () => {
     await fs.rm(tempDir, { recursive: true });
   });
 
-  describe('--producer', () => {
-    it('creates .clafoutis/producer.json', async () => {
-      await initCommand({ producer: true });
+  describe('producer mode', () => {
+    it('creates .clafoutis/producer.json with default values', async () => {
+      await initCommand({ producer: true, nonInteractive: true });
 
       const configPath = path.join(tempDir, '.clafoutis/producer.json');
       const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
       expect(config.tokens).toBe('./tokens');
       expect(config.output).toBe('./build');
-      expect(config.generators).toHaveProperty('tailwind');
-      expect(config.generators).toHaveProperty('figma');
+      expect(config.generators.tailwind).toBe(true);
     });
 
-    it('creates example tokens file', async () => {
-      await initCommand({ producer: true });
+    it('creates starter token files', async () => {
+      await initCommand({ producer: true, nonInteractive: true });
 
-      const tokensPath = path.join(tempDir, 'tokens/colors/primitives.json');
-      const tokens = JSON.parse(await fs.readFile(tokensPath, 'utf-8'));
+      const colorTokensPath = path.join(
+        tempDir,
+        'tokens/colors/primitives.json'
+      );
+      const colorTokens = JSON.parse(
+        await fs.readFile(colorTokensPath, 'utf-8')
+      );
+      expect(colorTokens.color.primary).toBeDefined();
 
-      expect(tokens.color.primary.$type).toBe('color');
-      expect(tokens.color.primary.$value).toBe('#3b82f6');
+      const spacingTokensPath = path.join(
+        tempDir,
+        'tokens/spacing/primitives.json'
+      );
+      const spacingTokens = JSON.parse(
+        await fs.readFile(spacingTokensPath, 'utf-8')
+      );
+      expect(spacingTokens.spacing).toBeDefined();
     });
 
-    it('creates GitHub workflow', async () => {
-      await initCommand({ producer: true });
+    it('creates GitHub workflow by default', async () => {
+      await initCommand({ producer: true, nonInteractive: true });
 
       const workflowPath = path.join(
         tempDir,
@@ -51,67 +62,184 @@ describe('initCommand', () => {
       );
       const workflow = await fs.readFile(workflowPath, 'utf-8');
 
-      expect(workflow).toContain('npx clafoutis generate');
+      expect(workflow).toContain('clafoutis generate');
       expect(workflow).toContain('softprops/action-gh-release');
+    });
+
+    it('skips workflow with --no-workflow', async () => {
+      await initCommand({
+        producer: true,
+        workflow: false,
+        nonInteractive: true,
+      });
+
+      const workflowExists = await fs
+        .access('.github/workflows/clafoutis-release.yml')
+        .then(() => true)
+        .catch(() => false);
+
+      expect(workflowExists).toBe(false);
+    });
+
+    it('uses custom paths from flags', async () => {
+      await initCommand({
+        producer: true,
+        tokens: './design-tokens',
+        output: './dist',
+        nonInteractive: true,
+      });
+
+      const configPath = path.join(tempDir, '.clafoutis/producer.json');
+      const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+
+      expect(config.tokens).toBe('./design-tokens');
+      expect(config.output).toBe('./dist');
+    });
+
+    it('uses custom generators from flags', async () => {
+      await initCommand({
+        producer: true,
+        generators: 'tailwind,figma',
+        nonInteractive: true,
+      });
+
+      const configPath = path.join(tempDir, '.clafoutis/producer.json');
+      const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+
+      expect(config.generators.tailwind).toBe(true);
+      expect(config.generators.figma).toBe(true);
     });
 
     it('throws if config already exists', async () => {
       await fs.mkdir('.clafoutis', { recursive: true });
       await fs.writeFile('.clafoutis/producer.json', '{}');
 
-      await expect(initCommand({ producer: true })).rejects.toThrow(
-        'already exists'
-      );
+      await expect(
+        initCommand({ producer: true, nonInteractive: true })
+      ).rejects.toThrow('already exists');
+    });
+
+    it('overwrites with --force flag', async () => {
+      await fs.mkdir('.clafoutis', { recursive: true });
+      await fs.writeFile('.clafoutis/producer.json', '{"old": "config"}');
+
+      await initCommand({ producer: true, force: true, nonInteractive: true });
+
+      const configPath = path.join(tempDir, '.clafoutis/producer.json');
+      const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+
+      expect(config.old).toBeUndefined();
+      expect(config.tokens).toBe('./tokens');
     });
   });
 
-  describe('--consumer', () => {
-    it('creates .clafoutis/consumer.json', async () => {
-      await initCommand({ consumer: true });
+  describe('consumer mode', () => {
+    it('creates .clafoutis/consumer.json with provided repo', async () => {
+      await initCommand({
+        consumer: true,
+        repo: 'Acme/design-system',
+        nonInteractive: true,
+      });
 
       const configPath = path.join(tempDir, '.clafoutis/consumer.json');
       const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
-      expect(config.repo).toBe('YourOrg/design-system');
-      expect(config.version).toBe('v1.0.0');
-      expect(config.files).toHaveProperty('scss._colors.scss');
-      expect(config.files).toHaveProperty('tailwind.config.js');
+      expect(config.repo).toBe('Acme/design-system');
+      expect(config.version).toBe('latest');
+      expect(config.files).toBeDefined();
     });
 
-    it('uses provided repo', async () => {
-      await initCommand({ consumer: true, repo: 'MyOrg/tokens' });
+    it('uses default file mappings', async () => {
+      await initCommand({
+        consumer: true,
+        repo: 'Acme/design-system',
+        nonInteractive: true,
+      });
 
       const configPath = path.join(tempDir, '.clafoutis/consumer.json');
       const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
-      expect(config.repo).toBe('MyOrg/tokens');
+      expect(config.files['tailwind.base.css']).toBe('./src/styles/base.css');
+      expect(config.files['tailwind.config.js']).toBe('./tailwind.config.js');
+    });
+
+    it('uses custom file mappings from flags', async () => {
+      await initCommand({
+        consumer: true,
+        repo: 'Acme/design-system',
+        files: 'tokens.css:./src/tokens.css,vars.scss:./src/vars.scss',
+        nonInteractive: true,
+      });
+
+      const configPath = path.join(tempDir, '.clafoutis/consumer.json');
+      const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+
+      expect(config.files['tokens.css']).toBe('./src/tokens.css');
+      expect(config.files['vars.scss']).toBe('./src/vars.scss');
+    });
+
+    it('throws if repo not provided in non-interactive mode', async () => {
+      await expect(
+        initCommand({ consumer: true, nonInteractive: true })
+      ).rejects.toThrow('--repo is required');
     });
 
     it('throws if config already exists', async () => {
       await fs.mkdir('.clafoutis', { recursive: true });
       await fs.writeFile('.clafoutis/consumer.json', '{}');
 
-      await expect(initCommand({ consumer: true })).rejects.toThrow(
-        'already exists'
-      );
+      await expect(
+        initCommand({ consumer: true, repo: 'Acme/ds', nonInteractive: true })
+      ).rejects.toThrow('already exists');
+    });
+
+    it('overwrites with --force flag', async () => {
+      await fs.mkdir('.clafoutis', { recursive: true });
+      await fs.writeFile('.clafoutis/consumer.json', '{"repo": "Old/repo"}');
+
+      await initCommand({
+        consumer: true,
+        repo: 'New/repo',
+        force: true,
+        nonInteractive: true,
+      });
+
+      const configPath = path.join(tempDir, '.clafoutis/consumer.json');
+      const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+
+      expect(config.repo).toBe('New/repo');
     });
   });
 
-  describe('default behavior', () => {
-    it('defaults to consumer mode', async () => {
-      await initCommand({});
+  describe('dry-run mode', () => {
+    it('does not write files in dry-run mode', async () => {
+      await initCommand({ producer: true, dryRun: true, nonInteractive: true });
 
-      const consumerConfigExists = await fs
-        .access('.clafoutis/consumer.json')
-        .then(() => true)
-        .catch(() => false);
-      const producerConfigExists = await fs
+      const configExists = await fs
         .access('.clafoutis/producer.json')
         .then(() => true)
         .catch(() => false);
 
-      expect(consumerConfigExists).toBe(true);
-      expect(producerConfigExists).toBe(false);
+      expect(configExists).toBe(false);
+    });
+
+    it('does not create tokens in dry-run mode', async () => {
+      await initCommand({ producer: true, dryRun: true, nonInteractive: true });
+
+      const tokensExist = await fs
+        .access('tokens')
+        .then(() => true)
+        .catch(() => false);
+
+      expect(tokensExist).toBe(false);
+    });
+  });
+
+  describe('non-interactive mode', () => {
+    it('requires --producer or --consumer', async () => {
+      await expect(initCommand({ nonInteractive: true })).rejects.toThrow(
+        'you must specify --producer or --consumer'
+      );
     });
   });
 });
