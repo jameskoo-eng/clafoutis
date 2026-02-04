@@ -9,6 +9,7 @@ import {
   sanitizeManifest,
   writeManifestWithBackup,
   restoreBackups,
+  isExcludedPath,
   type Manifest,
   type PackageInfo,
   type Backup,
@@ -464,5 +465,50 @@ describe('writeManifestWithBackup and restoreBackups', () => {
 
     expect(readFileSync(file1, 'utf8')).toBe(content1);
     expect(readFileSync(file2, 'utf8')).toBe(content2);
+  });
+});
+
+describe('isExcludedPath', () => {
+  it('returns true for exact match', () => {
+    const excluded = new Set(['/repo/packages/internal']);
+    expect(isExcludedPath('/repo/packages/internal', excluded)).toBe(true);
+  });
+
+  it('returns true for nested path under excluded directory', () => {
+    const excluded = new Set(['/repo/packages/internal']);
+    expect(isExcludedPath('/repo/packages/internal/subdir', excluded)).toBe(true);
+    expect(isExcludedPath('/repo/packages/internal/deep/nested', excluded)).toBe(true);
+  });
+
+  it('returns false for sibling path', () => {
+    const excluded = new Set(['/repo/packages/internal']);
+    expect(isExcludedPath('/repo/packages/public', excluded)).toBe(false);
+  });
+
+  it('returns false for partial name match (not a real prefix)', () => {
+    const excluded = new Set(['/repo/packages/internal']);
+    // "internal-tools" should NOT be excluded just because it starts with "internal"
+    expect(isExcludedPath('/repo/packages/internal-tools', excluded)).toBe(false);
+  });
+
+  it('returns false when no exclusions', () => {
+    const excluded = new Set<string>();
+    expect(isExcludedPath('/repo/packages/anything', excluded)).toBe(false);
+  });
+
+  it('handles multiple exclusions', () => {
+    const excluded = new Set(['/repo/packages/internal', '/repo/apps/private']);
+    expect(isExcludedPath('/repo/packages/internal', excluded)).toBe(true);
+    expect(isExcludedPath('/repo/apps/private', excluded)).toBe(true);
+    expect(isExcludedPath('/repo/packages/public', excluded)).toBe(false);
+    expect(isExcludedPath('/repo/apps/web', excluded)).toBe(false);
+  });
+
+  it('works with normalized paths (no trailing separators)', () => {
+    // In practice, path.dirname() never returns trailing slashes,
+    // so excluded paths will always be normalized without trailing slashes
+    const excluded = new Set(['/repo/packages/internal']);
+    expect(isExcludedPath('/repo/packages/internal', excluded)).toBe(true);
+    expect(isExcludedPath('/repo/packages/internal/subdir', excluded)).toBe(true);
   });
 });

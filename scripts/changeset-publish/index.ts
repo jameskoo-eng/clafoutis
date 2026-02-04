@@ -91,13 +91,47 @@ function getWorkspacePatterns(): string[] {
   return patterns;
 }
 
+/**
+ * Check if a path should be excluded based on negated patterns.
+ * A path is excluded if it equals or is under any excluded directory.
+ */
+export function isExcludedPath(targetPath: string, excludedPaths: Set<string>): boolean {
+  const normalizedTarget = path.normalize(targetPath);
+  for (const excluded of excludedPaths) {
+    const normalizedExcluded = path.normalize(excluded);
+    // Check if target equals or is under the excluded path
+    if (
+      normalizedTarget === normalizedExcluded ||
+      normalizedTarget.startsWith(normalizedExcluded + path.sep)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function listPackages(): PackageInfo[] {
   const results: PackageInfo[] = [];
   const patterns = getWorkspacePatterns();
   const seen = new Set<string>();
 
+  // Collect paths excluded by negated patterns
+  const excludedPaths = new Set<string>();
   for (const pattern of patterns) {
-    // Skip negated patterns (exclusions)
+    if (pattern.startsWith('!')) {
+      // Strip the leading '!' and glob for package.json files
+      const negatedPattern = pattern.slice(1);
+      const globPattern = path.join(repoRoot, negatedPattern, 'package.json');
+      const matches = globSync(globPattern);
+      for (const manifestPath of matches) {
+        // Store the directory path for exclusion checking
+        excludedPaths.add(path.dirname(manifestPath));
+      }
+    }
+  }
+
+  for (const pattern of patterns) {
+    // Skip negated patterns (already processed above)
     if (pattern.startsWith('!')) continue;
 
     // Glob for package.json files matching the pattern
@@ -110,6 +144,10 @@ function listPackages(): PackageInfo[] {
       seen.add(manifestPath);
 
       const dir = path.dirname(manifestPath);
+
+      // Skip if this path is excluded by a negated pattern
+      if (isExcludedPath(dir, excludedPaths)) continue;
+
       try {
         const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as Manifest;
         if (manifest.name) {

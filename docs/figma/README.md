@@ -8,9 +8,9 @@ When a design system uses Clafoutis with the Figma generator, it produces:
 
 | File | Description |
 |------|-------------|
-| `variables.json` | Figma-compatible variables in JSON format |
+| `figma.variables.json` | Figma-compatible variables in JSON format |
 
-The `variables.json` file contains variable collections organized by mode (Light/Dark) with properly transformed values for colors, dimensions, and typography tokens.
+The `figma.variables.json` file contains variable collections organized by mode (Light/Dark) with properly transformed values for colors, dimensions, and typography tokens.
 
 ---
 
@@ -81,7 +81,7 @@ The Figma generator produces a JSON file structured as variable collections:
 1. Download `figma.variables.json` from your design system's GitHub Release
 2. In Tokens Studio, click **Settings** (gear icon)
 3. Select **Import** → **From file**
-4. Choose your `variables.json` file
+4. Choose your `figma.variables.json` file
 5. Map the collections to your desired Figma variable collections
 
 ### Syncing with GitHub (Recommended)
@@ -93,8 +93,29 @@ For automated sync, configure Tokens Studio to pull directly from your GitHub re
 3. Configure:
    - **Repository**: `YourOrg/design-system`
    - **Branch**: `main` (or your release branch)
-   - **File path**: `build/figma/variables.json`
-   - **Personal access token**: Your GitHub PAT with `repo` scope
+   - **File path**: `build/figma/figma.variables.json`
+   - **Personal access token**: A GitHub PAT (see options below)
+
+#### GitHub Token Options
+
+**Option A: Fine-grained PAT (Recommended)**
+
+Fine-grained tokens provide minimal access scoped to specific repositories:
+
+1. Go to **GitHub Settings** → **Developer settings** → **Personal access tokens** → **Fine-grained tokens**
+2. Click **Generate new token**
+3. Set **Repository access** to **Only select repositories** and choose `YourOrg/design-system`
+4. Under **Repository permissions**, set **Contents** to **Read-only**
+5. Generate and copy the token
+
+**Option B: Classic PAT**
+
+Classic tokens are simpler but grant broader access:
+
+1. Go to **GitHub Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
+2. Click **Generate new token**
+3. Select the `repo` scope (or `public_repo` for public repositories)
+4. Generate and copy the token
 
 Now tokens will sync automatically when you open the plugin.
 
@@ -113,16 +134,24 @@ For automated CI/CD integration, you can use Figma's Variables REST API to progr
 
 1. **Get your file key** from the Figma URL: `figma.com/file/{FILE_KEY}/...`
 
-2. **Download the generated variables.json** from your design system release
+2. **Download the generated `figma.variables.json`** from your design system release
 
-3. **Transform and POST to Figma API**:
+3. **Set environment variables** for your credentials:
 
 ```bash
-# Example using curl
-curl -X POST "https://api.figma.com/v1/files/{FILE_KEY}/variables" \
-  -H "X-Figma-Token: YOUR_FIGMA_TOKEN" \
+export FIGMA_TOKEN="your-figma-api-token"
+export FIGMA_FILE_KEY="your-file-key"
+```
+
+> **Security note:** Never hardcode tokens in scripts or documentation. Always use environment variables or a secrets manager.
+
+4. **Transform and POST to Figma API**:
+
+```bash
+curl -X POST "https://api.figma.com/v1/files/$FIGMA_FILE_KEY/variables" \
+  -H "X-Figma-Token: $FIGMA_TOKEN" \
   -H "Content-Type: application/json" \
-  -d @transformed-variables.json
+  -d @figma-api-payload.json
 ```
 
 ### Transform Script
@@ -132,7 +161,7 @@ The Clafoutis output format needs transformation to match Figma's API schema. He
 ```javascript
 import fs from 'fs';
 
-const clafoutisOutput = JSON.parse(fs.readFileSync('variables.json', 'utf8'));
+const clafoutisOutput = JSON.parse(fs.readFileSync('figma.variables.json', 'utf8'));
 
 // Transform to Figma API format
 const figmaPayload = {
@@ -249,7 +278,7 @@ npx clafoutis init --consumer --repo YourOrg/design-system
 npx clafoutis sync
 ```
 
-The `variables.json` file will be downloaded to `./figma/variables.json`, ready for import into Figma.
+The `figma.variables.json` file will be downloaded to `./figma/figma.variables.json`, ready for import into Figma.
 
 ---
 
@@ -286,7 +315,7 @@ You can then apply modes to frames, and all nested elements inherit the mode's v
 Figma uses 0-1 range for RGBA values. The Clafoutis generator automatically converts from 0-255 to 0-1. If colors appear wrong:
 
 1. Verify your source tokens use standard hex or RGB formats
-2. Check the generated `variables.json` for correct value ranges
+2. Check the generated `figma.variables.json` for correct value ranges
 
 ### Variables not appearing in Figma
 
