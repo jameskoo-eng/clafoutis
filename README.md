@@ -19,22 +19,253 @@ In today's AI-powered development environment, maintaining brand consistency bet
 - **GitOps Integration**: Version control your design system alongside your codebase
 - **Realtime Generation**: Transform tokens into platform-specific formats automatically
 - **Recommended Starting Design Tokens**: We will be building a 'recommended' design token schema, allowing developers and designers to build their own design system from Day 1. See /tokens/\*.
+- **Version-Controlled Distribution**: Pin to specific versions for reproducible builds
+- **Custom Generators**: Create platform-specific generators with full StyleDictionary access
 
 ## Supported Platforms 🎯
 
 ### Design Tools
 
 - **Figma**: Generate variables and styles directly in your Figma files
-  - [Documentation](https://github.com/Dessert-Labs/claf/blob/main/docs/figma/README.md)
+  - [Documentation](./docs/figma/README.md)
 
 ### Development Frameworks
 
 - **React/Tailwind**: Generate Tailwind configuration and React components
-  - [Documentation](https://github.com/Dessert-Labs/claf/blob/main/docs/tailwind/README.md)
+  - [Documentation](./docs/tailwind/README.md)
 
 ## Getting Started 🚀
 
-Coming soon.
+### Installation
+
+```bash
+npm install -D clafoutis
+```
+
+### For Design System Producers
+
+```bash
+# Initialize a new design system
+npx clafoutis init --producer
+
+# Edit your tokens in tokens/colors/primitives.json
+
+# Generate platform outputs
+npx clafoutis generate
+
+# Push to GitHub - releases are created automatically
+```
+
+### For Application Consumers
+
+```bash
+# Initialize consumer configuration
+npx clafoutis init --consumer --repo YourOrg/design-system
+
+# Edit .clafoutis/consumer.json to set your desired version
+
+# Sync tokens from GitHub Release
+npx clafoutis sync
+
+# Commit the synced tokens
+git add .clafoutis/ src/tokens/
+git commit -m "chore: add design tokens"
+```
+
+### Private Repository Access
+
+See [Token Distribution Guide](docs/distribution/README.md#private-repositories) for setting up access to private design system repos.
+
+## CLI Commands 💻
+
+### `clafoutis generate`
+
+Generate platform outputs from design tokens (for producers).
+
+```bash
+npx clafoutis generate [options]
+
+Options:
+  -c, --config <path>  Config file (default: .clafoutis/producer.json)
+  --tailwind           Generate Tailwind output
+  --figma              Generate Figma variables
+  -o, --output <dir>   Output directory (default: ./build)
+  --dry-run            Preview changes without writing files
+```
+
+### `clafoutis sync`
+
+Sync design tokens from a GitHub Release (for consumers).
+
+```bash
+npx clafoutis sync [options]
+
+Options:
+  -f, --force          Force sync even if versions match
+  -c, --config <path>  Config file (default: .clafoutis/consumer.json)
+  --dry-run            Preview changes without writing files
+```
+
+### `clafoutis init`
+
+Initialize Clafoutis configuration. When run without flags in an interactive terminal, an interactive wizard guides you through the setup.
+
+```bash
+npx clafoutis init [options]
+
+Options:
+  --producer           Set up as a design token producer
+  --consumer           Set up as a design token consumer
+  -r, --repo <repo>    GitHub repo for consumer mode (org/name)
+  -t, --tokens <path>  Token directory path (default: ./tokens)
+  -o, --output <path>  Output directory path (default: ./build)
+  -g, --generators <list>  Comma-separated generators: tailwind, figma
+  --workflow           Create GitHub Actions workflow (default: true)
+  --no-workflow        Skip GitHub Actions workflow
+  --files <mapping>    File mappings for consumer: asset:dest,asset:dest
+  --force              Overwrite existing configuration
+  --dry-run            Preview changes without writing files
+  --non-interactive    Skip prompts, use defaults or flags
+```
+
+**Interactive Wizard:**
+
+Running `npx clafoutis init` without arguments launches an interactive wizard that guides you through:
+
+- Selecting producer or consumer mode
+- Choosing generators (Tailwind, Figma)
+- Setting token and output directories
+- Creating GitHub Actions workflows
+
+**Non-Interactive Mode (CI/CD):**
+
+For automation, use `--non-interactive` with explicit flags:
+
+```bash
+# Producer setup in CI
+npx clafoutis init --producer --generators=tailwind,figma --tokens=./tokens --output=./build --non-interactive
+
+# Consumer setup in CI
+npx clafoutis init --consumer --repo=Acme/design-system --files=tailwind.base.css:./src/styles/base.css --non-interactive
+```
+
+## Configuration ⚙️
+
+### Producer Configuration (.clafoutis/producer.json)
+
+```json
+{
+  "tokens": "./tokens",
+  "output": "./build",
+  "generators": {
+    "tailwind": true,
+    "figma": true
+  }
+}
+```
+
+### Consumer Configuration (.clafoutis/consumer.json)
+
+```json
+{
+  "repo": "YourOrg/design-system",
+  "version": "v1.0.0",
+  "files": {
+    "scss._colors.scss": "src/tokens/_colors.scss",
+    "scss._typography.scss": "src/tokens/_typography.scss",
+    "tailwind.config.js": "./tailwind.config.js"
+  },
+  "postSync": "npx prettier --write ./src/tokens/"
+}
+```
+
+- `repo`: GitHub repository in `org/name` format
+- `version`: Release tag to sync (e.g., `v1.0.0`) or `"latest"`
+- `files`: Mapping of release asset names to local file paths
+- `postSync`: (Optional) Command to run after syncing files
+
+Asset names are flattened from the build directory (e.g., `build/scss/_colors.scss` becomes `scss._colors.scss`).
+
+Example configurations are available in [`apps/cli/examples/`](apps/cli/examples/).
+
+## Custom Generators 🔧
+
+You can create custom generators for your specific platform needs:
+
+```json
+{
+  "tokens": "./tokens",
+  "output": "./build",
+  "generators": {
+    "tailwind": true,
+    "brand-scss": "./generators/brand-scss.ts"
+  }
+}
+```
+
+Custom generators are TypeScript files that export a `generate` function:
+
+```typescript
+import type { GeneratorPlugin } from 'clafoutis';
+
+export const generate: GeneratorPlugin = async ({ tokensDir, outputDir, StyleDictionary }) => {
+  // Use StyleDictionary to transform tokens
+  const sd = new StyleDictionary({
+    source: [`${tokensDir}/**/*.json`],
+    platforms: {
+      scss: {
+        transformGroup: 'scss',
+        buildPath: outputDir + '/',
+        files: [{ destination: '_colors.scss', format: 'scss/variables' }],
+      },
+    },
+  });
+
+  await sd.buildAllPlatforms();
+};
+```
+
+## Project Structure 📁
+
+```
+clafoutis/
+├── apps/
+│   └── cli/              # Main CLI package
+├── packages/
+│   ├── eslint-config/    # Shared ESLint config
+│   ├── prettier-config/  # Shared Prettier config
+│   ├── shared/           # Shared utilities (logger)
+│   ├── vitest-config/    # Shared Vitest config
+│   └── generators/       # Token generators
+├── docs/                 # Documentation
+├── examples/             # Example configs and workflows
+├── schemas/              # JSON schemas
+├── tokens/               # Example design tokens
+└── Makefile              # Development commands
+```
+
+## Documentation 📚
+
+- [Token Distribution Guide](docs/distribution/README.md) - Complete guide for producers and consumers
+
+## Development 🛠️
+
+```bash
+# Install dependencies
+make init
+
+# Build all packages
+make build-all
+
+# Run all checks (lint, format, type-check)
+make check-all
+
+# Fix all issues (lint, format)
+make fix-all
+
+# Run tests
+make test-all
+```
 
 ## Why GitOps? 🔄
 

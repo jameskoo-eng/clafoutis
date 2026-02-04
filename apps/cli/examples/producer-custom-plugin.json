@@ -1,0 +1,8 @@
+{
+  "tokens": "./tokens",
+  "output": "./build",
+  "generators": {
+    "tailwind": true,
+    "custom-scss": "./generators/scss-variables.ts"
+  }
+}

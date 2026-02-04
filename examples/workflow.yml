@@ -1,0 +1,76 @@
+name: Generate and Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tokens/**'
+      - '.clafoutis/producer.json'
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0, 1.1.0)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install -D clafoutis
+
+      - run: npx clafoutis generate
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            # Manual trigger: use the provided version as-is (supports beta, rc, etc.)
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-increment: only consider strict semver tags (vX.Y.Z)
+            LATEST=$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+            if [ -z "$LATEST" ]; then
+              echo "version=1.0.0" >> $GITHUB_OUTPUT
+            else
+              VERSION=${LATEST#v}
+              IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+              PATCH=$((PATCH + 1))
+              echo "version=${MAJOR}.${MINOR}.${PATCH}" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          while IFS= read -r -d '' file; do
+            relative="${file#build/}"
+            flat_name="${relative//\//.}"
+            target="release-assets/$flat_name"
+            if [ -e "$target" ]; then
+              echo "::error::Collision detected: '$relative' flattens to '$flat_name' which already exists"
+              exit 1
+            fi
+            cp "$file" "$target"
+          done < <(find build -type f -print0)
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Design Tokens v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: release-assets/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

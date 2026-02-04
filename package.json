@@ -1,25 +1,26 @@
 {
-  "name": "claf",
-  "version": "0.0.1",
-  "description": "A GitOps powered design system generator for Humans and AI-powered code generation.",
-  "author": "Dessert",
-  "license": "Business Source License",
-  "private": false,
-  "type": "module",
-  "dependencies": {
-    "glob": "^11.0.2",
-    "style-dictionary": "^5.0.0",
-    "tinycolor2": "^1.6.0"
+  "name": "clafoutis",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitOps powered design system generator - generate and sync design tokens",
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=22.0.0"
   },
   "scripts": {
-    "generate": "pnpm generate:tailwind && pnpm generate:figma",
-    "generate:tailwind": "tsx ./generators/tailwind/tailwindGenerator.ts",
-    "generate:figma": "tsx ./generators/figma/figmaGenerator.ts"
+    "prepare": "husky install",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint:check",
+    "lint:fix": "turbo lint:write",
+    "format": "turbo format:check",
+    "format:fix": "turbo format:write",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "clean": "turbo clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "@types/node": "^22.15.27",
-    "@types/tinycolor2": "^1.4.6",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "husky": "^8.0.3",
+    "turbo": "^1.13.0"
   }
 }
