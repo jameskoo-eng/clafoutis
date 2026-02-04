@@ -54,12 +54,11 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          for file in $(find build -type f); do
-            # Convert build/tailwind/base.css -> tailwind.base.css
+          while IFS= read -r -d '' file; do
             relative="${file#build/}"
-            flat_name=$(echo "$relative" | sed 's/\//./g')
+            flat_name="${relative//\//.}"
             cp "$file" "release-assets/$flat_name"
-          done
+          done < <(find build -type f -print0)
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

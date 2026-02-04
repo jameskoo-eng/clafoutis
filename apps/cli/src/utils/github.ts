@@ -11,6 +11,7 @@ interface GitHubRelease {
   tag_name: string;
   assets: Array<{
     name: string;
+    url: string;
     browser_download_url: string;
   }>;
 }
@@ -82,9 +83,7 @@ export async function downloadRelease(
     logger.info(`Downloading ${assetName}...`);
 
     const downloadHeaders = { ...headers, Accept: 'application/octet-stream' };
-    const fileRes = await fetch(asset.browser_download_url, {
-      headers: downloadHeaders,
-    });
+    const fileRes = await fetch(asset.url, { headers: downloadHeaders });
 
     if (!fileRes.ok) {
       failedDownloads.push(assetName);

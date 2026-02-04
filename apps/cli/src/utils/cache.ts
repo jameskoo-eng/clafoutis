@@ -6,12 +6,19 @@ const CACHE_FILE = `${CACHE_DIR}/cache`;
 /**
  * Reads the cached version from .clafoutis/cache file.
  * Returns null if the cache file does not exist.
+ * Rethrows other errors (permissions, corruption, etc.).
  */
 export async function readCache(): Promise<string | null> {
   try {
     return (await fs.readFile(CACHE_FILE, 'utf-8')).trim();
-  } catch {
-    return null;
+  } catch (err: unknown) {
+    if (
+      err instanceof Error &&
+      (err as NodeJS.ErrnoException).code === 'ENOENT'
+    ) {
+      return null;
+    }
+    throw err;
   }
 }
 
