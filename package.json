@@ -1,25 +1,65 @@
 {
-  "name": "claf",
-  "version": "0.0.1",
-  "description": "A GitOps powered design system generator for Humans and AI-powered code generation.",
+  "name": "clafoutis",
+  "version": "0.1.0",
+  "description": "GitOps powered design system generator - generate and sync design tokens",
   "author": "Dessert",
   "license": "Business Source License",
-  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dessert-Labs/clafoutis.git"
+  },
+  "homepage": "https://github.com/Dessert-Labs/clafoutis#readme",
+  "bugs": {
+    "url": "https://github.com/Dessert-Labs/clafoutis/issues"
+  },
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "gitops",
+    "tailwind",
+    "figma",
+    "scss",
+    "css-variables"
+  ],
   "type": "module",
+  "bin": {
+    "clafoutis": "./dist/cli/index.js"
+  },
+  "main": "./dist/cli/types.js",
+  "types": "./dist/cli/types.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cli/types.d.ts",
+      "import": "./dist/cli/types.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "templates/**/*",
+    "schemas/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build",
+    "release:publish": "pnpm publish --access public --no-git-checks"
+  },
   "dependencies": {
+    "ajv": "^8.12.0",
+    "commander": "^12.0.0",
     "glob": "^11.0.2",
     "style-dictionary": "^5.0.0",
-    "tinycolor2": "^1.6.0"
-  },
-  "scripts": {
-    "generate": "pnpm generate:tailwind && pnpm generate:figma",
-    "generate:tailwind": "tsx ./generators/tailwind/tailwindGenerator.ts",
-    "generate:figma": "tsx ./generators/figma/figmaGenerator.ts"
+    "tinycolor2": "^1.6.0",
+    "tsx": "^4.19.4"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.0",
     "@types/node": "^22.15.27",
     "@types/tinycolor2": "^1.4.6",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "@vitest/coverage-v8": "^2.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^2.0.0"
   }
 }

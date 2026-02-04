@@ -56,7 +56,7 @@ StyleDictionary.registerTransform({
     }
 
     // Handle references by getting the resolved value
-    const resolvedValue = typeof value === 'string' && value.startsWith('{') 
+    const resolvedValue = typeof value === 'string' && value.startsWith('{')
       ? token.value // Use the already resolved value from Style Dictionary
       : value;
 
@@ -238,9 +238,15 @@ async function main(): Promise<void> {
   logger.success("Figma variables built!");
 }
 
-main().catch((err) => {
-  logger.error(`Error building Figma variables: ${err}`);
-  process.exit(1);
-});
+// Run directly if executed as script
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    logger.error(`Error building Figma variables: ${err}`);
+    process.exit(1);
+  });
+}
 
-export { main }; 
+export { main };
+
+// Plugin API compatibility
+export const generate = main;

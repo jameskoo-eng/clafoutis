@@ -435,10 +435,16 @@ async function main(): Promise<void> {
   logger.success("All builds finished!");
 }
 
-main().catch((err) => {
-  console.error("Error building tokens:", err);
-  process.exit(1);
-});
+// Run directly if executed as script
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error("Error building tokens:", err);
+    process.exit(1);
+  });
+}
 
 export { main };
+
+// Plugin API compatibility
+export const generate = main;
 
