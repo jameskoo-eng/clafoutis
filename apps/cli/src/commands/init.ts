@@ -42,6 +42,52 @@ interface FileToCreate {
 }
 
 /**
+ * Parses and validates a comma-separated generators string.
+ * Each entry can be:
+ * - A built-in generator name: "tailwind", "figma"
+ * - A custom generator with path: "name:./path/to/plugin.js"
+ *
+ * @param generatorsString - Comma-separated generators string
+ * @returns Array of validated generator entries
+ * @throws ClafoutisError if any entries are invalid
+ */
+function parseGenerators(generatorsString: string): string[] {
+  const entries = generatorsString.split(',').map(g => g.trim());
+  const invalidEntries: string[] = [];
+
+  for (const entry of entries) {
+    if (!entry) {
+      invalidEntries.push('(empty entry - check for extra commas)');
+      continue;
+    }
+
+    const colonIdx = entry.indexOf(':');
+    if (colonIdx === 0) {
+      invalidEntries.push(`"${entry}" (missing generator name before ":")`);
+    } else if (colonIdx > 0) {
+      const name = entry.slice(0, colonIdx).trim();
+      const pluginPath = entry.slice(colonIdx + 1).trim();
+      if (!name) {
+        invalidEntries.push(`"${entry}" (empty generator name)`);
+      }
+      if (!pluginPath) {
+        invalidEntries.push(`"${entry}" (missing path after ":")`);
+      }
+    }
+  }
+
+  if (invalidEntries.length > 0) {
+    throw new ClafoutisError(
+      'Invalid generator entries',
+      `The following entries are malformed:\n  - ${invalidEntries.join('\n  - ')}`,
+      'Use format "tailwind,figma" for built-ins or "name:./path/to/plugin.js" for custom generators'
+    );
+  }
+
+  return entries.filter(e => e.length > 0);
+}
+
+/**
  * Main init command handler.
  * Supports both interactive wizard and non-interactive CLI flag modes.
  * @throws ClafoutisError if both --producer and --consumer flags are set
@@ -132,7 +178,7 @@ async function runNonInteractiveInit(
 
     const answers: ProducerWizardAnswers = {
       generators: options.generators
-        ? options.generators.split(',').map(g => g.trim())
+        ? parseGenerators(options.generators)
         : ['tailwind'],
       tokens: options.tokens ?? './tokens',
       output: options.output ?? './build',
@@ -220,22 +266,14 @@ async function createProducerConfig(
     );
   }
 
-  // Build generators object from answers.generators array
-  // Each entry can be:
-  // - "tailwind" or "figma" → sets generators[name] = true
-  // - "name:path" → sets generators[name] = path (custom plugin)
   const generators: Record<string, boolean | string> = {};
   for (const entry of answers.generators) {
     const colonIdx = entry.indexOf(':');
     if (colonIdx > 0) {
-      // Custom generator with path: "custom:./path/to/plugin.js"
       const name = entry.slice(0, colonIdx).trim();
       const pluginPath = entry.slice(colonIdx + 1).trim();
-      if (name && pluginPath) {
-        generators[name] = pluginPath;
-      }
+      generators[name] = pluginPath;
     } else {
-      // Built-in generator: "tailwind" or "figma"
       generators[entry] = true;
     }
   }
