@@ -48,6 +48,15 @@ describe('getWorkflowTemplate', () => {
     expect(template).toContain('softprops/action-gh-release@v2');
   });
 
+  it('computes next semver version from git tags', () => {
+    const template = getWorkflowTemplate();
+    expect(template).toContain('git fetch --tags');
+    expect(template).toContain("git tag -l 'v[0-9]*.[0-9]*.[0-9]*'");
+    expect(template).toContain('sort -V');
+    expect(template).toContain('NEXT_VERSION="v1.0.0"');
+    expect(template).toContain('NEXT_PATCH=$((PATCH + 1))');
+  });
+
   it('uploads build artifacts', () => {
     const template = getWorkflowTemplate();
     expect(template).toContain('build/**/*');

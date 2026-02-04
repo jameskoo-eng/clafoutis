@@ -36,16 +36,16 @@ jobs:
         id: version
         run: |
           if [ -n "${{ inputs.version }}" ]; then
+            # Manual trigger: use the provided version as-is (supports beta, rc, etc.)
             echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
           else
-            LATEST=$(git tag -l 'v*' --sort=-v:refname | head -n1)
+            # Auto-increment: only consider strict semver tags (vX.Y.Z)
+            LATEST=$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
             if [ -z "$LATEST" ]; then
               echo "version=1.0.0" >> $GITHUB_OUTPUT
             else
               VERSION=${LATEST#v}
-              MAJOR=$(echo $VERSION | cut -d. -f1)
-              MINOR=$(echo $VERSION | cut -d. -f2)
-              PATCH=$(echo $VERSION | cut -d. -f3)
+              IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
               PATCH=$((PATCH + 1))
               echo "version=${MAJOR}.${MINOR}.${PATCH}" >> $GITHUB_OUTPUT
             fi
@@ -57,7 +57,7 @@ jobs:
           for file in $(find build -type f); do
             # Convert build/tailwind/base.css -> tailwind.base.css
             relative="${file#build/}"
-            flat_name=$(echo "$relative" | sed 's/\//./')
+            flat_name=$(echo "$relative" | sed 's/\//./g')
             cp "$file" "release-assets/$flat_name"
           done
 

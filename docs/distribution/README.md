@@ -127,14 +127,62 @@ When you run `npx clafoutis init --producer`, a GitHub Actions workflow is creat
 3. **Creates a GitHub Release** with all generated files as assets
 4. **Auto-increments** the patch version (e.g., `v1.0.0` → `v1.0.1`)
 
-**Manual version control**: You can also trigger a release manually with a specific version:
+### Manual Releases & Pre-release Versions
+
+The workflow supports two release modes:
+
+**Automatic releases** (on push to main):
+- Triggered when `tokens/**` or `.clafoutis/producer.json` changes
+- Auto-increments the patch version based on existing strict semver tags (`vX.Y.Z`)
+- Example: `v1.0.2` → `v1.0.3`
+
+**Manual releases** (via workflow_dispatch):
+- Triggered manually with any version string you specify
+- Supports pre-release versions like `1.0.0-beta.1`, `2.0.0-rc.1`, `1.1.0-alpha`
+- Does not affect automatic version detection (only strict `vX.Y.Z` tags are considered for auto-increment)
+
+#### Triggering a Manual Release
+
+**Via GitHub CLI:**
 
 ```bash
-# Via GitHub CLI
-gh workflow run "Generate and Release" -f version=1.1.0
+# Release a beta version
+gh workflow run "Generate and Release" -f version=2.0.0-beta.1
 
-# Or via GitHub UI: Actions → Generate and Release → Run workflow
+# Release a release candidate
+gh workflow run "Generate and Release" -f version=2.0.0-rc.1
+
+# Release a specific version (bypassing auto-increment)
+gh workflow run "Generate and Release" -f version=1.1.0
 ```
+
+**Via GitHub UI:**
+
+1. Go to your repository on GitHub
+2. Click **Actions** tab
+3. Select **Generate and Release** workflow
+4. Click **Run workflow** dropdown
+5. Enter your version (e.g., `2.0.0-beta.1`)
+6. Click **Run workflow**
+
+#### Consumer Usage with Pre-release Versions
+
+Consumers can pin to pre-release versions just like any other version:
+
+```json
+{
+  "repo": "YourOrg/design-system",
+  "version": "v2.0.0-beta.1",
+  "files": {
+    "tailwind.base.css": "src/styles/base.css"
+  }
+}
+```
+
+This is useful for:
+- Testing new design system features before a stable release
+- Gradual rollouts across multiple consuming applications
+- Beta testing with select teams before wider adoption
 
 **Release assets**: The workflow flattens the build directory structure into dot-separated asset names to avoid filename conflicts.
 

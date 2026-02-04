@@ -30,15 +30,35 @@ jobs:
       - name: Generate tokens
         run: clafoutis generate
 
-      - name: Get version
+      - name: Get next version
         id: version
-        run: echo "version=$(date +%Y%m%d.%H%M%S)" >> $GITHUB_OUTPUT
+        run: |
+          # Fetch all tags
+          git fetch --tags
+
+          # Get the latest semver tag (vX.Y.Z format), default to v0.0.0 if none exist
+          LATEST_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n 1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            NEXT_VERSION="v1.0.0"
+          else
+            # Extract major.minor.patch and increment patch
+            VERSION=\${LATEST_TAG#v}
+            MAJOR=$(echo $VERSION | cut -d. -f1)
+            MINOR=$(echo $VERSION | cut -d. -f2)
+            PATCH=$(echo $VERSION | cut -d. -f3)
+            NEXT_PATCH=$((PATCH + 1))
+            NEXT_VERSION="v$MAJOR.$MINOR.$NEXT_PATCH"
+          fi
+
+          echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          echo "Next version: $NEXT_VERSION"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v\${{ steps.version.outputs.version }}
-          name: Design Tokens v\${{ steps.version.outputs.version }}
+          tag_name: \${{ steps.version.outputs.version }}
+          name: Design Tokens \${{ steps.version.outputs.version }}
           generate_release_notes: true
           files: |
             build/**/*

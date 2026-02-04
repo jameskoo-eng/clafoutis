@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import Ajv, { type ErrorObject } from 'ajv';
+import { Ajv, type ErrorObject } from 'ajv';
 
 import { ClafoutisError } from '../utils/errors.js';
 
@@ -59,7 +59,7 @@ export function validateConfig(
   schema: object,
   configPath: string
 ): void {
-  const ajv = new Ajv.default({ allErrors: true, strict: false });
+  const ajv = new Ajv({ allErrors: true, strict: false });
   const validate = ajv.compile(schema);
 
   if (!validate(config)) {

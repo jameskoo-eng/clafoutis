@@ -1,5 +1,5 @@
 import { logger } from '@clafoutis/shared';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -109,7 +109,72 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
   logger.success(`Synced to ${config.version}`);
 
   if (config.postSync) {
-    logger.info(`Running: ${config.postSync}`);
-    exec(config.postSync);
+    await runPostSync(config.postSync);
   }
+}
+
+/**
+ * Executes the postSync command safely using shell spawn.
+ * Awaits completion and handles errors with proper logging of stdout/stderr.
+ * Uses the system shell to parse the command string, which is necessary
+ * for commands like "npx prettier --write ./src/styles/base.css".
+ *
+ * @param command - The shell command string to execute
+ * @throws ClafoutisError if the command fails or exits with non-zero code
+ */
+async function runPostSync(command: string): Promise<void> {
+  logger.info(`Running postSync: ${command}`);
+
+  // Determine the shell based on platform
+  const isWindows = process.platform === 'win32';
+  const shell = isWindows ? 'cmd.exe' : '/bin/sh';
+  const shellArgs = isWindows ? ['/c', command] : ['-c', command];
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(shell, shellArgs, {
+      stdio: ['inherit', 'pipe', 'pipe'],
+      env: process.env,
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout?.on('data', (data: Buffer) => {
+      stdout += data.toString();
+    });
+
+    child.stderr?.on('data', (data: Buffer) => {
+      stderr += data.toString();
+    });
+
+    child.on('error', (err: Error) => {
+      reject(
+        new ClafoutisError(
+          'postSync failed',
+          `Failed to spawn command: ${err.message}`,
+          'Check that the command is valid and executable'
+        )
+      );
+    });
+
+    child.on('close', (code: number | null) => {
+      if (code === 0) {
+        if (stdout.trim()) {
+          logger.info(stdout.trim());
+        }
+        logger.success('postSync completed');
+        resolve();
+      } else {
+        const output = [stdout, stderr].filter(Boolean).join('\n').trim();
+        logger.error(`postSync output:\n${output || '(no output)'}`);
+        reject(
+          new ClafoutisError(
+            'postSync failed',
+            `Command exited with code ${code}`,
+            'Review the command output above and fix any issues'
+          )
+        );
+      }
+    });
+  });
 }
