@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Design token generators for Clafoutis",
   "author": "Dessert",
-  "license": "Business Source License",
+  "license": "BUSL-1.1",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

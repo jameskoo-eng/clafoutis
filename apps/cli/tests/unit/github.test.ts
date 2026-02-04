@@ -42,7 +42,7 @@ describe('downloadRelease', () => {
     expect(files.get('_colors.scss')).toBe('$color: #fff;');
   });
 
-  it('handles missing assets gracefully', async () => {
+  it('throws error for missing assets', async () => {
     const mockRelease = { assets: [] };
 
     vi.mocked(fetch).mockResolvedValueOnce({
@@ -58,8 +58,7 @@ describe('downloadRelease', () => {
       },
     };
 
-    const files = await downloadRelease(config);
-    expect(files.size).toBe(0);
+    await expect(downloadRelease(config)).rejects.toThrow('Download failed');
   });
 
   it('downloads multiple assets', async () => {
@@ -106,31 +105,38 @@ describe('downloadRelease', () => {
   });
 
   it('includes authorization header when CLAFOUTIS_REPO_TOKEN is set', async () => {
+    const prevToken = process.env.CLAFOUTIS_REPO_TOKEN;
     process.env.CLAFOUTIS_REPO_TOKEN = 'test-token';
 
-    const mockRelease = { assets: [] };
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockRelease),
-    } as Response);
+    try {
+      const mockRelease = { assets: [] };
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockRelease),
+      } as Response);
 
-    const config = {
-      repo: 'test/repo',
-      version: 'v1.0.0',
-      files: {},
-    };
+      const config = {
+        repo: 'test/repo',
+        version: 'v1.0.0',
+        files: {},
+      };
 
-    await downloadRelease(config);
+      await downloadRelease(config);
 
-    expect(fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: 'token test-token',
-        }),
-      })
-    );
-
-    delete process.env.CLAFOUTIS_REPO_TOKEN;
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'token test-token',
+          }),
+        })
+      );
+    } finally {
+      if (prevToken === undefined) {
+        delete process.env.CLAFOUTIS_REPO_TOKEN;
+      } else {
+        process.env.CLAFOUTIS_REPO_TOKEN = prevToken;
+      }
+    }
   });
 });

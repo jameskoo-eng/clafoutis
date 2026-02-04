@@ -28,8 +28,10 @@ describe('readConfig', () => {
     const config = {
       repo: 'test/repo',
       version: 'v1.0.0',
-      output: { scss: 'out.scss' },
-      files: ['_primitives.scss'],
+      files: {
+        '_primitives.scss': 'src/tokens/_primitives.scss',
+        'tailwind.config.js': './tailwind.config.js',
+      },
     };
     await fs.writeFile(
       path.join(tempDir, '.clafoutis.json'),

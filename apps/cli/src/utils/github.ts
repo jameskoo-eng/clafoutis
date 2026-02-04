@@ -1,7 +1,11 @@
 import { logger } from '@clafoutis/shared';
 
 import type { ClafoutisConfig } from '../types.js';
-import { authRequiredError, releaseNotFoundError } from './errors.js';
+import {
+  authRequiredError,
+  ClafoutisError,
+  releaseNotFoundError,
+} from './errors.js';
 
 interface GitHubRelease {
   assets: Array<{
@@ -16,6 +20,7 @@ interface GitHubRelease {
  *
  * @param config - Consumer configuration containing repo, version, and files to download
  * @returns Map of filename to file content
+ * @throws ClafoutisError if any requested assets are missing or fail to download
  */
 export async function downloadRelease(
   config: ClafoutisConfig
@@ -46,12 +51,14 @@ export async function downloadRelease(
 
   const release = (await releaseRes.json()) as GitHubRelease;
   const files = new Map<string, string>();
+  const missingAssets: string[] = [];
+  const failedDownloads: string[] = [];
 
   for (const assetName of Object.keys(config.files)) {
     const asset = release.assets.find(a => a.name === assetName);
 
     if (!asset) {
-      logger.warn(`${assetName} not found in release, skipping`);
+      missingAssets.push(assetName);
       continue;
     }
 
@@ -63,11 +70,28 @@ export async function downloadRelease(
     });
 
     if (!fileRes.ok) {
-      logger.warn(`Failed to download ${assetName}`);
+      failedDownloads.push(assetName);
       continue;
     }
 
     files.set(assetName, await fileRes.text());
+  }
+
+  const errors: string[] = [];
+  if (missingAssets.length > 0) {
+    errors.push(`Assets not found in release: ${missingAssets.join(', ')}`);
+  }
+  if (failedDownloads.length > 0) {
+    errors.push(`Failed to download: ${failedDownloads.join(', ')}`);
+  }
+
+  if (errors.length > 0) {
+    const availableAssets = release.assets.map(a => a.name).join(', ');
+    throw new ClafoutisError(
+      'Download failed',
+      errors.join('\n'),
+      `Available assets in ${config.version}: ${availableAssets || 'none'}`
+    );
   }
 
   return files;

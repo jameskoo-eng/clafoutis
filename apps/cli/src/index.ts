@@ -43,23 +43,33 @@ function withErrorHandling<T>(
   };
 }
 
-process.on('uncaughtException', err => {
+/**
+ * Handles unexpected errors (both sync and async) with consistent formatting.
+ */
+function handleUnexpectedError(err: unknown): void {
   if (err instanceof ClafoutisError) {
     displayError(err);
   } else {
+    const message = err instanceof Error ? err.message : String(err);
     if (process.stdin.isTTY) {
-      p.log.error(`Unexpected error: ${err.message}`);
+      p.log.error(`Unexpected error: ${message}`);
       p.log.info(
         'Please report this issue at: https://github.com/Dessert-Labs/clafoutis/issues'
       );
     } else {
-      console.error(`\nUnexpected error: ${err.message}\n`);
+      console.error(`\nUnexpected error: ${message}\n`);
       console.error(
         'Please report this issue at: https://github.com/Dessert-Labs/clafoutis/issues'
       );
     }
   }
   process.exit(1);
+}
+
+process.on('uncaughtException', handleUnexpectedError);
+
+process.on('unhandledRejection', (reason: unknown) => {
+  handleUnexpectedError(reason);
 });
 
 program

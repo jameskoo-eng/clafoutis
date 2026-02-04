@@ -5,8 +5,6 @@ import StyleDictionary from 'style-dictionary';
 import type { DesignToken, ValueTransform } from 'style-dictionary/types';
 import tinycolor from 'tinycolor2';
 
-const { glob } = await import('glob');
-
 // Types
 interface FigmaColor {
   r: number;

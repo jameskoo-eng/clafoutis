@@ -117,7 +117,7 @@ describe('Plugin System', () => {
       })
     );
 
-    await expect(generateCommand({})).resolves.not.toThrow();
+    await expect(generateCommand({})).rejects.toThrow('Generation failed');
   });
 
   it('receives config in context', async () => {

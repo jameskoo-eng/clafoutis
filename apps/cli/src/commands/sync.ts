@@ -87,9 +87,12 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
   }
 
   if (!options.force && config.version === cachedVersion) {
-    const firstOutputPath = Object.values(config.files)[0];
-    const outputExists = firstOutputPath && (await fileExists(firstOutputPath));
-    if (outputExists) {
+    const outputPaths = Object.values(config.files);
+    const existsResults = await Promise.all(
+      outputPaths.map(p => fileExists(p))
+    );
+    const allOutputsExist = existsResults.every(exists => exists);
+    if (allOutputsExist) {
       logger.success(`Already at ${config.version} - no sync needed`);
       return;
     }

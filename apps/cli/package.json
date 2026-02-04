@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "description": "GitOps powered design system CLI - generate and sync design tokens",
   "author": "Dessert",
-  "license": "Business Source License",
+  "license": "BUSL-1.1",
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "bin": {
     "clafoutis": "./dist/index.js"
   },

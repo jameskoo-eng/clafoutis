@@ -116,6 +116,7 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
   logger.info(`Output: ${outputDir}`);
 
   const generators = config.generators || { tailwind: true, figma: true };
+  let hadFailure = false;
 
   for (const [name, value] of Object.entries(generators)) {
     if (value === false) continue;
@@ -175,7 +176,16 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
         throw err;
       }
       logger.error(`${name} failed: ${err}`);
+      hadFailure = true;
     }
+  }
+
+  if (hadFailure) {
+    throw new ClafoutisError(
+      'Generation failed',
+      'One or more generators failed',
+      'Check the error messages above and fix the issues'
+    );
   }
 
   logger.success('Generation complete');
