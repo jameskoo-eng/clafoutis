@@ -400,14 +400,20 @@ async function main(): Promise<void> {
     logger.success("Base theme built!");
   }
 
-  // Dark styles - include all tokens for reference resolution, but filter output to dark tokens only
+  // Dark styles - load dark tokens AFTER base tokens so dark values take precedence
   {
     console.log("Building dark theme...");
     const SD = new StyleDictionary({
       source: [
-        "tokens/**/*.json", // Include all tokens for reference resolution
+        // Order matters! Load base tokens first for reference resolution,
+        // then dark tokens to override with dark-specific values
+        "tokens/**/!(*.dark).json",
+        "tokens/**/*.dark.json",
       ],
-      log: { verbosity: "verbose" },
+      log: {
+        verbosity: logVerbosityLevels.default,
+        warnings: logWarningLevels.disabled, // Disable collision warnings for dark build
+      },
       platforms: {
         base: {
           transformGroup: "css",
