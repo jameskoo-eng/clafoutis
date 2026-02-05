@@ -74,6 +74,7 @@ other:
   });
 
   it('handles tab indentation', () => {
+    // While not strictly valid YAML, pnpm-workspace.yaml files may use tabs
     const yaml = `packages:
 \t- 'apps/*'
 \t- 'packages/*'
@@ -87,6 +88,59 @@ other:
   - '!packages/internal'
 `;
     expect(parseWorkspaceYaml(yaml)).toEqual(['packages/*', '!packages/internal']);
+  });
+
+  it('parses flow-style arrays', () => {
+    const yaml = `packages: ['apps/*', 'packages/*']`;
+    expect(parseWorkspaceYaml(yaml)).toEqual(['apps/*', 'packages/*']);
+  });
+
+  it('parses flow-style arrays with double quotes', () => {
+    const yaml = `packages: ["apps/*", "packages/*"]`;
+    expect(parseWorkspaceYaml(yaml)).toEqual(['apps/*', 'packages/*']);
+  });
+
+  it('converts single string to array', () => {
+    const yaml = `packages: 'apps/*'`;
+    expect(parseWorkspaceYaml(yaml)).toEqual(['apps/*']);
+  });
+
+  it('converts unquoted single string to array', () => {
+    const yaml = `packages: apps/*`;
+    expect(parseWorkspaceYaml(yaml)).toEqual(['apps/*']);
+  });
+
+  it('returns empty array for unclosed flow array', () => {
+    const yaml = `packages: [unclosed`;
+    expect(parseWorkspaceYaml(yaml)).toEqual([]);
+  });
+
+  it('returns empty array for null packages value', () => {
+    const yaml = `packages: null`;
+    expect(parseWorkspaceYaml(yaml)).toEqual([]);
+  });
+
+  it('returns empty array for tilde (null) packages value', () => {
+    const yaml = `packages: ~`;
+    expect(parseWorkspaceYaml(yaml)).toEqual([]);
+  });
+
+  it('parses block array and ignores non-list lines', () => {
+    // Lines that don't start with "- " are ignored in block mode
+    const yaml = `packages:
+  - 'apps/*'
+  - 'packages/*'
+`;
+    expect(parseWorkspaceYaml(yaml)).toEqual(['apps/*', 'packages/*']);
+  });
+
+  it('handles empty string content', () => {
+    expect(parseWorkspaceYaml('')).toEqual([]);
+  });
+
+  it('handles empty array', () => {
+    const yaml = `packages: []`;
+    expect(parseWorkspaceYaml(yaml)).toEqual([]);
   });
 });
 

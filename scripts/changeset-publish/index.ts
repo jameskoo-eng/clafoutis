@@ -43,31 +43,64 @@ export interface Backup {
 
 /**
  * Parse workspace patterns from pnpm-workspace.yaml content.
- * Expected format:
- *   packages:
- *     - 'apps/*'
- *     - 'packages/*'
+ * Handles common YAML formats without external dependencies:
+ *   - Block arrays: packages:\n  - 'apps/*'\n  - 'packages/*'
+ *   - Flow-style arrays: packages: ['apps/*', 'packages/*']
+ *   - Single string (converted to array): packages: 'apps/*'
+ *   - Quoted and unquoted entries
  */
 export function parseWorkspaceYaml(content: string): string[] {
   const patterns: string[] = [];
-
-  // Simple line-by-line parsing for the packages array
+  const lines = content.split('\n');
   let inPackages = false;
-  for (const line of content.split('\n')) {
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
-    if (trimmed === 'packages:') {
+
+    // Check for packages: key
+    const packagesMatch = trimmed.match(/^packages\s*:\s*(.*)$/);
+    if (packagesMatch) {
+      const inlineValue = packagesMatch[1].trim();
+
+      // Check for flow-style array: packages: ['apps/*', 'packages/*']
+      if (inlineValue.startsWith('[')) {
+        const flowMatch = inlineValue.match(/^\[([^\]]*)\]/);
+        if (flowMatch) {
+          const items = flowMatch[1].split(',').map((s) => s.trim());
+          return items
+            .map((item) => item.replace(/^['"]|['"]$/g, '')) // Strip quotes
+            .filter((item) => item.length > 0);
+        }
+        return [];
+      }
+
+      // Check for single inline string value (not empty, not a comment, not null/~)
+      if (inlineValue && !inlineValue.startsWith('#')) {
+        const singleValue = inlineValue.replace(/^['"]|['"]$/g, '').trim();
+        if (singleValue && singleValue !== 'null' && singleValue !== '~') {
+          // This is a single inline value like: packages: 'apps/*'
+          return [singleValue];
+        }
+      }
+
+      // Start block-style array parsing
       inPackages = true;
       continue;
     }
+
     if (inPackages) {
-      // Stop if we hit another top-level key (no leading whitespace and ends with ':')
-      if (trimmed && !line.startsWith(' ') && !line.startsWith('\t') && trimmed.endsWith(':')) {
+      // Stop if we hit another top-level key (no leading whitespace and contains ':')
+      if (trimmed && !line.startsWith(' ') && !line.startsWith('\t') && /^[a-zA-Z_][a-zA-Z0-9_-]*\s*:/.test(trimmed)) {
         break;
       }
       // Match array items like "- 'apps/*'" or '- "packages/*"' or "- apps/*"
-      const match = trimmed.match(/^-\s*['"]?([^'"]+)['"]?$/);
+      const match = trimmed.match(/^-\s*['"]?([^'"#]+)['"]?\s*(?:#.*)?$/);
       if (match) {
-        patterns.push(match[1]);
+        const value = match[1].trim();
+        if (value) {
+          patterns.push(value);
+        }
       }
     }
   }

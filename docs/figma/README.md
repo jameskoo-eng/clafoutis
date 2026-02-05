@@ -173,7 +173,33 @@ const figmaPayload = {
 
 clafoutisOutput.forEach((collection, collectionIndex) => {
   const collectionId = `collection_${collectionIndex}`;
-  
+
+  // Pre-pass: Build a stable mapping from variable name to ID and type
+  // by collecting all unique variables across all modes
+  const variableMap = new Map(); // name -> { id, type }
+  let varCounter = 0;
+
+  for (const mode of collection.modes) {
+    for (const variable of mode.variables) {
+      if (!variableMap.has(variable.name)) {
+        variableMap.set(variable.name, {
+          id: `var_${collectionIndex}_${varCounter++}`,
+          type: variable.type
+        });
+      } else {
+        // Validate type consistency across modes
+        const existing = variableMap.get(variable.name);
+        if (existing.type !== variable.type) {
+          console.warn(
+            `Warning: Variable "${variable.name}" has inconsistent types ` +
+            `across modes: "${existing.type}" vs "${variable.type}". ` +
+            `Using type from first occurrence.`
+          );
+        }
+      }
+    }
+  }
+
   figmaPayload.variableCollections.push({
     action: 'CREATE',
     id: collectionId,
@@ -181,9 +207,21 @@ clafoutisOutput.forEach((collection, collectionIndex) => {
     initialModeId: `mode_${collectionIndex}_0`
   });
 
+  // Create all variables from the canonical map
+  for (const [name, { id, type }] of variableMap) {
+    figmaPayload.variables.push({
+      action: 'CREATE',
+      id: id,
+      name: name,
+      variableCollectionId: collectionId,
+      resolvedType: type
+    });
+  }
+
+  // Process each mode
   collection.modes.forEach((mode, modeIndex) => {
     const modeId = `mode_${collectionIndex}_${modeIndex}`;
-    
+
     figmaPayload.variableModes.push({
       action: 'CREATE',
       id: modeId,
@@ -191,26 +229,39 @@ clafoutisOutput.forEach((collection, collectionIndex) => {
       variableCollectionId: collectionId
     });
 
-    mode.variables.forEach((variable, varIndex) => {
-      const variableId = `var_${collectionIndex}_${varIndex}`;
-      
-      // Only create variable once (first mode)
-      if (modeIndex === 0) {
-        figmaPayload.variables.push({
-          action: 'CREATE',
-          id: variableId,
-          name: variable.name,
-          variableCollectionId: collectionId,
-          resolvedType: variable.type
-        });
+    // Track which variables this mode defines
+    const modeVariableNames = new Set(mode.variables.map(v => v.name));
+
+    // Warn about variables missing from this mode
+    for (const expectedName of variableMap.keys()) {
+      if (!modeVariableNames.has(expectedName)) {
+        console.warn(
+          `Warning: Variable "${expectedName}" is missing from mode ` +
+          `"${mode.name}" in collection "${collection.name}". ` +
+          `No value will be set for this mode.`
+        );
+      }
+    }
+
+    // Create mode values using the stable variable ID mapping
+    for (const variable of mode.variables) {
+      const varInfo = variableMap.get(variable.name);
+      if (!varInfo) {
+        // This shouldn't happen since we built the map from all modes,
+        // but handle it defensively
+        console.warn(
+          `Warning: Unexpected variable "${variable.name}" in mode ` +
+          `"${mode.name}". Skipping.`
+        );
+        continue;
       }
 
       figmaPayload.variableModeValues.push({
-        variableId: variableId,
+        variableId: varInfo.id,
         modeId: modeId,
         value: variable.value
       });
-    });
+    }
   });
 });
 
@@ -278,7 +329,7 @@ npx clafoutis init --consumer --repo YourOrg/design-system
 npx clafoutis sync
 ```
 
-The `figma.variables.json` file will be downloaded to `./figma/figma.variables.json`, ready for import into Figma.
+The `figma.variables.json` file will be downloaded to `./figma/variables.json`, ready for import into Figma.
 
 ---
 
