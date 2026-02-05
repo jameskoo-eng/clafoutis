@@ -249,9 +249,9 @@ export function sanitizeManifest(
   info: PackageInfo,
   pkgsByName: Map<string, PackageInfo>
 ): { changed: boolean; next: Manifest } {
-  const blocks: DependencyBlock[] = [
+  // Runtime dependencies that end up in the published package
+  const runtimeBlocks: DependencyBlock[] = [
     'dependencies',
-    'devDependencies',
     'peerDependencies',
     'optionalDependencies',
   ];
@@ -259,7 +259,8 @@ export function sanitizeManifest(
   const next = JSON.parse(JSON.stringify(info.manifest)) as Manifest;
   let changed = false;
 
-  for (const block of blocks) {
+  // Process runtime dependencies - these must resolve to public packages
+  for (const block of runtimeBlocks) {
     const record = next[block];
     if (!record) continue;
 
@@ -283,6 +284,27 @@ export function sanitizeManifest(
           record[dep] = normalized;
           changed = true;
         }
+      }
+    }
+  }
+
+  // Process devDependencies - these are stripped during publish, so private deps are OK
+  // but we still need to convert workspace: protocol for consistency
+  const devRecord = next.devDependencies;
+  if (devRecord) {
+    for (const [dep, value] of Object.entries(devRecord)) {
+      if (typeof value !== 'string') continue;
+
+      if (value.startsWith('workspace:')) {
+        const target = pkgsByName.get(dep);
+        if (target?.manifest.version) {
+          const normalized = deriveWorkspaceRange(value, target.manifest.version);
+          if (normalized !== value) {
+            devRecord[dep] = normalized;
+            changed = true;
+          }
+        }
+        // If target not found or no version, just leave as-is (npm will strip devDeps anyway)
       }
     }
   }
