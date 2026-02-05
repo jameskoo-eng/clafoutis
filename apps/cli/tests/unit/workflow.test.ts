@@ -35,7 +35,7 @@ describe('getWorkflowTemplate', () => {
 
   it('installs clafoutis as dev dependency', () => {
     const template = getWorkflowTemplate();
-    expect(template).toContain('npm install -D clafoutis');
+    expect(template).toContain('npm install -D @clafoutis/cli');
   });
 
   it('runs generate command', () => {
