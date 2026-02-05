@@ -2,8 +2,8 @@
  * E2E tests against real GitHub repos (mock-design-system → mock-frontend)
  *
  * These tests run against the public test repos:
- * - Producer: https://github.com/beauwilliams/mock-design-system
- * - Consumer: https://github.com/beauwilliams/mock-frontend
+ * - Producer: https://github.com/Dessert-Labs/mock-design-system
+ * - Consumer: https://github.com/Dessert-Labs/mock-frontend
  *
  * They verify the full sync workflow works against real GitHub releases.
  */
