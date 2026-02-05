@@ -437,6 +437,61 @@ describe('sanitizeManifest', () => {
     );
   });
 
+  it('allows private packages in devDependencies', () => {
+    const privateConfig = createPackageInfo('config', '1.0.0', undefined, { private: true });
+    const bar: PackageInfo = {
+      dir: '/fake/bar',
+      manifestPath: '/fake/bar/package.json',
+      manifest: {
+        name: 'bar',
+        version: '2.0.0',
+        devDependencies: {
+          config: 'workspace:*',
+        },
+      },
+    };
+    const pkgsByName = createPackagesByName([privateConfig, bar]);
+
+    // Should NOT throw - private deps in devDependencies are allowed
+    const { changed, next } = sanitizeManifest(bar, pkgsByName);
+
+    expect(changed).toBe(true);
+    expect(next.devDependencies?.config).toBe('^1.0.0');
+  });
+
+  it('sanitizes devDependencies workspace protocol without requiring public package', () => {
+    const privateConfig: PackageInfo = {
+      dir: '/fake/config',
+      manifestPath: '/fake/config/package.json',
+      manifest: {
+        name: 'config',
+        version: '3.0.0',
+        private: true,
+      },
+    };
+    const app: PackageInfo = {
+      dir: '/fake/app',
+      manifestPath: '/fake/app/package.json',
+      manifest: {
+        name: 'app',
+        version: '1.0.0',
+        dependencies: {
+          lodash: '^4.0.0',
+        },
+        devDependencies: {
+          config: 'workspace:^',
+        },
+      },
+    };
+    const pkgsByName = createPackagesByName([privateConfig, app]);
+
+    const { changed, next } = sanitizeManifest(app, pkgsByName);
+
+    expect(changed).toBe(true);
+    expect(next.devDependencies?.config).toBe('^3.0.0');
+    expect(next.dependencies?.lodash).toBe('^4.0.0'); // unchanged
+  });
+
   it('does not mutate original manifest', () => {
     const foo = createPackageInfo('foo', '1.0.0');
     const bar = createPackageInfo('bar', '2.0.0', { foo: 'workspace:*' });
