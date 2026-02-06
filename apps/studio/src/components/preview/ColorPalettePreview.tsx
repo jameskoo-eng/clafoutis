@@ -1,5 +1,5 @@
 import type { ResolvedToken } from "@clafoutis/studio-core";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 interface ColorPalettePreviewProps {
   tokens: ResolvedToken[];
@@ -64,6 +64,7 @@ const surfaceColor = "rgb(var(--colors-surface-primary))";
 
 function Swatch({ token }: Readonly<{ token: ResolvedToken }>) {
   const [hovered, setHovered] = useState(false);
+  const tooltipId = useId();
   const value =
     typeof token.resolvedValue === "string" ? token.resolvedValue : undefined;
   const shade = token.path.split(".").pop() ?? "";
@@ -72,13 +73,17 @@ function Swatch({ token }: Readonly<{ token: ResolvedToken }>) {
   return (
     <div
       className="group relative text-center"
+      tabIndex={0}
       role="img"
       aria-label={`Color swatch: ${token.path}`}
+      aria-describedby={hovered ? tooltipId : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
     >
       <div
-        className="mx-auto h-10 w-10 rounded-lg shadow-sm transition-transform group-hover:scale-110"
+        className="mx-auto h-10 w-10 rounded-lg shadow-sm transition-transform group-hover:scale-110 group-focus-visible:scale-110"
         style={{ backgroundColor: value, border: `1px solid ${borderColor}` }}
       />
       <p className="mt-1 text-[10px]" style={{ color: mutedColor }}>
@@ -87,6 +92,8 @@ function Swatch({ token }: Readonly<{ token: ResolvedToken }>) {
 
       {hovered && (
         <div
+          id={tooltipId}
+          role="tooltip"
           className="absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-nowrap rounded px-2 py-1 text-xs shadow-lg"
           style={{
             backgroundColor: surfaceColor,

@@ -57,8 +57,21 @@ async function fetchDirectory(
       const fileContents = await getRepoContents(owner, repo, item.path, token);
       if (!Array.isArray(fileContents) && fileContents.content) {
         const decoded = atob(fileContents.content.replaceAll("\n", ""));
-        const relativePath = item.path.replace(new RegExp(`^${rootPath}/`), "");
-        result[relativePath] = JSON.parse(decoded);
+        // Escape special regex characters in rootPath and handle optional trailing slash
+        const escapedRootPath = rootPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const relativePath = item.path.replace(
+          new RegExp(`^${escapedRootPath}/?`),
+          "",
+        );
+        try {
+          result[relativePath] = JSON.parse(decoded);
+        } catch (err) {
+          console.error(
+            `Failed to parse JSON in token file "${item.path}":`,
+            err instanceof Error ? err.message : String(err),
+          );
+          // Skip malformed JSON files instead of aborting the entire load
+        }
       }
     }
   }

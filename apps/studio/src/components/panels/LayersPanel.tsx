@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface LayersPanelProps {
   nodes: DesignNode[];
+  allNodes: Map<string, DesignNode>;
   selectedIds: Set<string>;
   onSelectNode: (id: string) => void;
   onToggleVisible: (id: string, visible: boolean) => void;
@@ -13,6 +14,7 @@ interface LayersPanelProps {
 
 export function LayersPanel({
   nodes,
+  allNodes,
   selectedIds,
   onSelectNode,
   onToggleVisible,
@@ -28,6 +30,7 @@ export function LayersPanel({
           <LayerItem
             key={node.id}
             node={node}
+            allNodes={allNodes}
             selectedIds={selectedIds}
             depth={0}
             onSelectNode={onSelectNode}
@@ -47,6 +50,7 @@ export function LayersPanel({
 
 interface LayerItemProps {
   node: DesignNode;
+  allNodes: Map<string, DesignNode>;
   selectedIds: Set<string>;
   depth: number;
   onSelectNode: (id: string) => void;
@@ -56,6 +60,7 @@ interface LayerItemProps {
 
 function LayerItem({
   node,
+  allNodes,
   selectedIds,
   depth,
   onSelectNode,
@@ -64,6 +69,7 @@ function LayerItem({
 }: Readonly<LayerItemProps>) {
   const scene = node as SceneNode;
   const isSelected = selectedIds.has(node.id);
+  const hasChildren = scene.children?.length > 0;
 
   return (
     <div>
@@ -77,7 +83,7 @@ function LayerItem({
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={() => onSelectNode(node.id)}
       >
-        {scene.children?.length > 0 && <ChevronRight size={12} />}
+        {hasChildren && <ChevronRight size={12} />}
         <span className="flex-1 truncate">{node.name}</span>
         <button
           onClick={(e) => {
@@ -98,6 +104,22 @@ function LayerItem({
           {scene.locked ? <Lock size={12} /> : <Unlock size={12} />}
         </button>
       </div>
+      {hasChildren &&
+        scene.children
+          .map((childId) => allNodes.get(childId))
+          .filter(Boolean)
+          .map((child) => (
+            <LayerItem
+              key={child!.id}
+              node={child!}
+              allNodes={allNodes}
+              selectedIds={selectedIds}
+              depth={depth + 1}
+              onSelectNode={onSelectNode}
+              onToggleVisible={onToggleVisible}
+              onToggleLocked={onToggleLocked}
+            />
+          ))}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 interface BadgeProps {
   variant:
     | "default"
@@ -7,7 +9,7 @@ interface BadgeProps {
     | "success"
     | "warning"
     | "error";
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function Badge({ variant, children }: Readonly<BadgeProps>) {

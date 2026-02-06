@@ -139,11 +139,20 @@ const PublishView = ({
               </p>
             </div>
 
-            <Textarea
-              placeholder="Commit message"
-              value={message}
-              onChange={(e) => onMessageChange(e.target.value)}
-            />
+            <div>
+              <label
+                htmlFor="commit-message"
+                className="mb-1 block text-sm font-medium text-studio-text"
+              >
+                Commit message
+              </label>
+              <Textarea
+                id="commit-message"
+                placeholder="Commit message"
+                value={message}
+                onChange={(e) => onMessageChange(e.target.value)}
+              />
+            </div>
 
             <Button onClick={onPush} disabled={pushing || !branchName.trim()}>
               {pushing ? "Creating PR..." : "Create branch & PR"}

@@ -9,11 +9,23 @@ function CallbackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(globalThis.location.search);
     const code = params.get("code");
-    if (code) {
-      handleCallback(code).then(() => navigate({ to: "/" }));
+
+    if (!code) {
+      navigate({ to: "/", search: { error: "missing_code" } });
+      return;
     }
+
+    (async () => {
+      try {
+        await handleCallback(code);
+        navigate({ to: "/" });
+      } catch (error) {
+        console.error("Callback error:", error);
+        navigate({ to: "/", search: { error: "callback_failed" } });
+      }
+    })();
   }, [handleCallback, navigate]);
 
   return (

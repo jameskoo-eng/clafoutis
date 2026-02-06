@@ -1,4 +1,6 @@
-const variantStyles: Record<string, React.CSSProperties> = {
+import type { CSSProperties } from "react";
+
+const variantStyles: Record<string, CSSProperties> = {
   primary: {
     backgroundColor: "rgb(var(--colors-button-primary-bg))",
     color: "rgb(var(--colors-button-primary-text))",

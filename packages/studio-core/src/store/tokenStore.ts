@@ -179,6 +179,15 @@ function buildGroupTree(
   return root.children;
 }
 
+const MAX_UNDO_STACK = 50;
+
+function trimStack<T>(stack: T[], newItem: T): T[] {
+  const newStack = [...stack, newItem];
+  return newStack.length > MAX_UNDO_STACK
+    ? newStack.slice(-MAX_UNDO_STACK)
+    : newStack;
+}
+
 export interface TokenState {
   tokenFiles: Map<string, DTCGTokenFile>;
   resolvedTokens: ResolvedToken[];
@@ -365,7 +374,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
             tokenFiles,
             resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
             dirtyFiles,
-            undoStack: [...state.undoStack, snapshot],
+            undoStack: trimStack(state.undoStack, snapshot),
             redoStack: [],
           });
           updated = true;
@@ -382,7 +391,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
           tokenFiles,
           resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
           dirtyFiles,
-          undoStack: [...state.undoStack, snapshot],
+          undoStack: trimStack(state.undoStack, snapshot),
           redoStack: [],
         });
       }
@@ -404,7 +413,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         tokenFiles,
         resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
         dirtyFiles,
-        undoStack: [...state.undoStack, snapshot],
+        undoStack: trimStack(state.undoStack, snapshot),
         redoStack: [],
       });
     },
@@ -427,7 +436,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         tokenFiles,
         resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
         dirtyFiles,
-        undoStack: [...state.undoStack, snapshot],
+        undoStack: trimStack(state.undoStack, snapshot),
         redoStack: [],
       });
     },
@@ -564,7 +573,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         tokenFiles,
         resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
         dirtyFiles,
-        undoStack: [...state.undoStack, snapshot],
+        undoStack: trimStack(state.undoStack, snapshot),
         redoStack: [],
       });
     },
@@ -612,7 +621,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         tokenFiles,
         resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
         dirtyFiles,
-        undoStack: [...state.undoStack, snapshot],
+        undoStack: trimStack(state.undoStack, snapshot),
         redoStack: [],
       });
     },
@@ -649,7 +658,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         tokenFiles,
         resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
         dirtyFiles,
-        undoStack: [...state.undoStack, snapshot],
+        undoStack: trimStack(state.undoStack, snapshot),
         redoStack: [],
       });
     },
@@ -668,7 +677,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         tokenFiles: prev.files,
         resolvedTokens: resolveAll(prev.files, get().activeTheme),
         undoStack: state.undoStack.slice(0, -1),
-        redoStack: [...state.redoStack, currentSnapshot],
+        redoStack: trimStack(state.redoStack, currentSnapshot),
       });
     },
 
@@ -680,7 +689,7 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
       set({
         tokenFiles: next.files,
         resolvedTokens: resolveAll(next.files, get().activeTheme),
-        undoStack: [...state.undoStack, currentSnapshot],
+        undoStack: trimStack(state.undoStack, currentSnapshot),
         redoStack: state.redoStack.slice(0, -1),
       });
     },

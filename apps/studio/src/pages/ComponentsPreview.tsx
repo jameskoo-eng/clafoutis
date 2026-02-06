@@ -9,6 +9,7 @@ function useStoreColorTokens() {
   const cachedRef = useRef<ResolvedToken[]>([]);
   const prevLenRef = useRef(-1);
   const prevThemeRef = useRef("");
+  const prevTokensRef = useRef<ResolvedToken[] | null>(null);
 
   return useSyncExternalStore(store.subscribe, () => {
     const state = store.getState();
@@ -17,9 +18,11 @@ function useStoreColorTokens() {
 
     // Only recompute if the resolved tokens array or theme changed
     if (
+      tokens !== prevTokensRef.current ||
       tokens.length !== prevLenRef.current ||
       theme !== prevThemeRef.current
     ) {
+      prevTokensRef.current = tokens;
       prevLenRef.current = tokens.length;
       prevThemeRef.current = theme;
       cachedRef.current = state.getTokensByCategory("colors");

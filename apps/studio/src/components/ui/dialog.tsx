@@ -23,8 +23,12 @@ export const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-studio-text-muted hover:text-studio-text">
-        <X size={16} />
+      <DialogPrimitive.Close
+        aria-label="Close dialog"
+        className="absolute right-4 top-4 rounded-sm text-studio-text-muted hover:text-studio-text"
+      >
+        <X size={16} aria-hidden="true" />
+        <span className="sr-only">Close dialog</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>

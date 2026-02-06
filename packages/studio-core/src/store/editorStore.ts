@@ -69,7 +69,7 @@ function cloneNodesMap(
 export interface EditorState {
   nodes: Map<string, DesignNode>;
   pages: PageData[];
-  currentPageId: string;
+  currentPageId: string | null;
   documentName: string;
 
   selectedIds: Set<string>;
@@ -618,7 +618,7 @@ export const createEditorStore = (initialState?: Partial<EditorState>) => {
       const entry: HistoryEntry = {
         nodes: cloneNodesMap(nodes),
         pages: JSON.parse(JSON.stringify(pages)),
-        currentPageId,
+        currentPageId: currentPageId ?? pages[0]?.id ?? "",
         timestamp: Date.now(),
       };
       const newHistory = history.slice(0, historyIndex + 1);
@@ -770,10 +770,11 @@ export const createEditorStore = (initialState?: Partial<EditorState>) => {
       for (const [id, node] of Object.entries(doc.nodes)) {
         nodesMap.set(id, node);
       }
+      const hasPages = doc.pages && doc.pages.length > 0;
       set({
         documentName: doc.name,
-        pages: doc.pages,
-        currentPageId: doc.pages[0]?.id || "",
+        pages: doc.pages || [],
+        currentPageId: hasPages ? doc.pages[0].id : null,
         nodes: nodesMap,
         selectedIds: new Set(),
         history: [],

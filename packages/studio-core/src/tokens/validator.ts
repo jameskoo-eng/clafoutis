@@ -6,7 +6,7 @@ import type {
 
 const REFERENCE_PATTERN = /^\{([^}]+)\}$/;
 const HEX_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
-const DIMENSION_PATTERN = /^[\d.]+(px|rem|em|%|pt|vw|vh)?$/;
+const DIMENSION_PATTERN = /^(?:\d+|\d*\.\d+)(px|rem|em|%|pt|vw|vh)?$/;
 
 function isToken(value: unknown): value is DTCGToken {
   return (

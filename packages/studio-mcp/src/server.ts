@@ -28,7 +28,14 @@ function loadTokenFilesFromDisk(
       if (entry.isDirectory()) {
         walk(fullPath, relativePath);
       } else if (entry.name.endsWith(".json")) {
-        files[relativePath] = JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+        try {
+          files[relativePath] = JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+        } catch (err) {
+          console.error(
+            `Failed to read/parse JSON file: ${fullPath} (relativePath=${relativePath}, entry=${entry.name})`,
+            err,
+          );
+        }
       }
     }
   }
@@ -219,7 +226,21 @@ server.tool(
     createPr: z.boolean().optional(),
     force: z.boolean().optional(),
   },
-  async ({ repo, commitMessage, createPr, force }) => {
+  async ({ repo, commitMessage, branch, createPr, force }) => {
+    const repoPattern = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+    if (!repoPattern.test(repo)) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({
+              error: `Invalid repo format: "${repo}". Expected "owner/repo".`,
+            }),
+          },
+        ],
+      };
+    }
+
     if (!force) {
       const validation = validateTokens(tokenStore.getState().tokenFiles);
       const errors = validation.filter((v) => v.severity === "error");
@@ -238,16 +259,19 @@ server.tool(
       }
     }
 
-    const [owner, repoName] = repo.split("/");
+    const [owner, repoName] = repo.split("/") as [string, string];
     const tokenFiles = exportTokens(tokenStore.getState().tokenFiles);
     const files = Object.entries(tokenFiles).map(([fp, content]) => ({
       path: `tokens/${fp}`,
       content: serializeTokenFile(content),
     }));
 
+    const branchName =
+      branch ?? (createPr ? `studio-update-${Date.now()}` : undefined);
+
     const result = await pushToGitHub(owner, repoName, files, commitMessage, {
       createPr,
-      branchName: createPr ? `studio-update-${Date.now()}` : undefined,
+      branchName,
     });
 
     return {

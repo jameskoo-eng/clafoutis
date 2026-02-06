@@ -54,6 +54,13 @@ function walkTokensDir(
 export function getStarterTokenContent(fileName: string): string {
   const tokensDir = getTokensDir();
   const filePath = path.resolve(tokensDir, fileName);
+
+  // Guard against path traversal — filePath must remain inside tokensDir
+  const relative = path.relative(tokensDir, filePath);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error(`Invalid token file path: ${fileName}`);
+  }
+
   if (!fs.existsSync(filePath)) {
     throw new Error(`Unknown starter token file: ${fileName}`);
   }

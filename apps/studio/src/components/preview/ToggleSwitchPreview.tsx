@@ -7,7 +7,8 @@ interface ToggleProps {
 function Toggle({ pressed, onPressedChange, children }: Readonly<ToggleProps>) {
   return (
     <button
-      className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+      type="button"
+      className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
       style={{
         backgroundColor: pressed
           ? "rgb(var(--colors-toggle-active-bg))"
@@ -34,9 +35,10 @@ function Switch({ checked, onCheckedChange, label }: Readonly<SwitchProps>) {
   return (
     <label className="flex cursor-pointer items-center gap-3">
       <button
+        type="button"
         role="switch"
         aria-checked={checked}
-        className="relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors"
+        className="relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
         style={{
           backgroundColor: checked
             ? "rgb(var(--colors-switch-checked-bg))"

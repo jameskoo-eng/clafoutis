@@ -79,6 +79,7 @@ export const Default: Story = {
     canvasRef: createRef<HTMLCanvasElement>(),
     activeTool: "SELECT",
     pageNodes: mockNodes,
+    allNodes: new Map(mockNodes.map((n) => [n.id, n])),
     selectedIds: new Set<string>(),
     selectedNode: null,
     onSetTool: noop,

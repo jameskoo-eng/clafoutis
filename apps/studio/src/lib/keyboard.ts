@@ -276,7 +276,10 @@ export function useKeyboardShortcuts() {
         target.isContentEditable
       ) {
         if (isCtrl && (e.key === "z" || e.key === "y")) {
-          // allow undo/redo in inputs
+          // Let the browser's native undo/redo handle it; bail out
+          // so the editor shortcut loop below is never reached.
+          e.preventDefault();
+          return;
         } else {
           return;
         }

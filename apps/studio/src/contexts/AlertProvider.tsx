@@ -2,7 +2,9 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
@@ -82,8 +84,16 @@ export function AlertProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
 
   const removeAlert = useCallback((id: string) => {
+    const timerId = timersRef.current.get(id);
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+      timersRef.current.delete(id);
+    }
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
@@ -91,10 +101,22 @@ export function AlertProvider({
     (message: string, type: Alert["type"] = "info") => {
       const id = crypto.randomUUID();
       setAlerts((prev) => [...prev, { id, message, type }]);
-      setTimeout(() => removeAlert(id), 5000);
+      const timerId = globalThis.setTimeout(() => {
+        timersRef.current.delete(id);
+        removeAlert(id);
+      }, 5000);
+      timersRef.current.set(id, timerId);
     },
     [removeAlert],
   );
+
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => {
+      timers.forEach((timerId) => clearTimeout(timerId));
+      timers.clear();
+    };
+  }, []);
 
   const value = useMemo(
     () => ({ alerts, addAlert, removeAlert }),

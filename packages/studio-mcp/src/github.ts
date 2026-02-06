@@ -10,6 +10,20 @@ function headers() {
   };
 }
 
+async function throwResponseError(
+  res: Response,
+  label: string,
+): Promise<never> {
+  const text = await res.text();
+  let body: string;
+  try {
+    body = JSON.stringify(JSON.parse(text));
+  } catch {
+    body = text;
+  }
+  throw new Error(`${label}: ${res.status} - ${body}`);
+}
+
 async function getHeadSha(
   owner: string,
   repo: string,
@@ -19,7 +33,7 @@ async function getHeadSha(
     `${BASE_URL}/repos/${owner}/${repo}/git/ref/heads/${branch}`,
     { headers: headers() },
   );
-  if (!res.ok) throw new Error(`Failed to get HEAD: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to get HEAD");
   const data = (await res.json()) as { object: { sha: string } };
   return data.object.sha;
 }
@@ -33,7 +47,7 @@ async function getCommitTreeSha(
     `${BASE_URL}/repos/${owner}/${repo}/git/commits/${commitSha}`,
     { headers: headers() },
   );
-  if (!res.ok) throw new Error(`Failed to get commit: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to get commit");
   const data = (await res.json()) as { tree: { sha: string } };
   return data.tree.sha;
 }
@@ -51,7 +65,7 @@ async function createBlob(
       encoding: "base64",
     }),
   });
-  if (!res.ok) throw new Error(`Failed to create blob: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to create blob");
   const data = (await res.json()) as { sha: string };
   return data.sha;
 }
@@ -76,7 +90,7 @@ async function createTree(
     headers: headers(),
     body: JSON.stringify({ base_tree: baseTreeSha, tree }),
   });
-  if (!res.ok) throw new Error(`Failed to create tree: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to create tree");
   const data = (await res.json()) as { sha: string };
   return data.sha;
 }
@@ -93,7 +107,7 @@ async function createCommit(
     headers: headers(),
     body: JSON.stringify({ message, tree: treeSha, parents: [parentSha] }),
   });
-  if (!res.ok) throw new Error(`Failed to create commit: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to create commit");
   const data = (await res.json()) as { sha: string };
   return data.sha;
 }
@@ -112,7 +126,7 @@ async function updateRef(
       body: JSON.stringify({ sha }),
     },
   );
-  if (!res.ok) throw new Error(`Failed to update ref: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to update ref");
 }
 
 async function createBranch(
@@ -121,12 +135,22 @@ async function createBranch(
   branchName: string,
   sha: string,
 ): Promise<void> {
+  // Check if the branch already exists — return early if so.
+  const check = await fetch(
+    `${BASE_URL}/repos/${owner}/${repo}/git/refs/heads/${branchName}`,
+    { headers: headers() },
+  );
+  if (check.ok) return;
+
   const res = await fetch(`${BASE_URL}/repos/${owner}/${repo}/git/refs`, {
     method: "POST",
     headers: headers(),
     body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha }),
   });
-  if (!res.ok) throw new Error(`Failed to create branch: ${res.status}`);
+
+  // 422 means the ref was created between our check and the POST — treat as non-fatal.
+  if (res.status === 422) return;
+  if (!res.ok) await throwResponseError(res, "Failed to create branch");
 }
 
 async function createPullRequest(
@@ -141,7 +165,7 @@ async function createPullRequest(
     headers: headers(),
     body: JSON.stringify({ title, head, base }),
   });
-  if (!res.ok) throw new Error(`Failed to create PR: ${res.status}`);
+  if (!res.ok) await throwResponseError(res, "Failed to create PR");
   const data = (await res.json()) as { html_url: string };
   return data.html_url;
 }

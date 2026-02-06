@@ -25,6 +25,7 @@ function ProjectLayoutRoute() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [tokenCount, setTokenCount] = useState<number | null>(null);
   const [fileCount, setFileCount] = useState<number | null>(null);
+  const [retryCounter, setRetryCounter] = useState(0);
   const loadedProjectRef = useRef<string | null>(null);
   const accessTokenRef = useRef(accessToken);
   accessTokenRef.current = accessToken;
@@ -90,10 +91,11 @@ function ProjectLayoutRoute() {
     return () => {
       cancelled = true;
     };
-  }, [projectId]);
+  }, [projectId, retryCounter]);
 
   const handleRetry = useCallback(() => {
     loadedProjectRef.current = null;
+    setRetryCounter((prev) => prev + 1);
     setLoadState("idle");
     setLoadError(null);
   }, []);

@@ -140,7 +140,11 @@ export function renderNode(
   }
 
   if (scene.clipContent) {
-    drawRoundedRect(ctx, 0, 0, scene.width, scene.height, scene.cornerRadius);
+    const cornerRadius =
+      scene.cornerRadius !== undefined && scene.cornerRadius !== null
+        ? scene.cornerRadius
+        : 0;
+    drawRoundedRect(ctx, 0, 0, scene.width, scene.height, cornerRadius);
     ctx.clip();
   }
 

@@ -10,6 +10,7 @@ interface CanvasEditorViewProps {
   canvasRef: React.Ref<HTMLCanvasElement>;
   activeTool: ToolType;
   pageNodes: DesignNode[];
+  allNodes: Map<string, DesignNode>;
   selectedIds: Set<string>;
   selectedNode: DesignNode | null;
   onSetTool: (tool: ToolType) => void;
@@ -27,6 +28,7 @@ const CanvasEditorView = ({
   canvasRef,
   activeTool,
   pageNodes,
+  allNodes,
   selectedIds,
   selectedNode,
   onSetTool,
@@ -54,6 +56,7 @@ const CanvasEditorView = ({
       <div className="w-60 overflow-y-auto border-r border-studio-border">
         <LayersPanel
           nodes={pageNodes}
+          allNodes={allNodes}
           selectedIds={selectedIds}
           onSelectNode={onSelectNode}
           onToggleVisible={onToggleVisible}

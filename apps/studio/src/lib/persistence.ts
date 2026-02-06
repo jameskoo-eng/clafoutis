@@ -11,8 +11,24 @@ interface DraftData {
   savedAt: number;
 }
 
+let dbConnection: IDBDatabase | null = null;
+let dbPromise: Promise<IDBDatabase> | null = null;
+
+function resetConnection(): void {
+  dbConnection = null;
+  dbPromise = null;
+}
+
 function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  if (dbConnection) {
+    return Promise.resolve(dbConnection);
+  }
+
+  if (dbPromise) {
+    return dbPromise;
+  }
+
+  dbPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
@@ -20,9 +36,27 @@ function openDB(): Promise<IDBDatabase> {
         db.createObjectStore(STORE_NAME, { keyPath: "projectId" });
       }
     };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result;
+      dbConnection = db;
+      resolve(db);
+    };
+    request.onerror = () => {
+      resetConnection();
+      reject(request.error);
+    };
   });
+
+  return dbPromise;
+}
+
+async function getDB(): Promise<IDBDatabase> {
+  try {
+    return await openDB();
+  } catch {
+    resetConnection();
+    return await openDB();
+  }
 }
 
 export async function saveDraft(
@@ -30,42 +64,66 @@ export async function saveDraft(
   tokenFiles: Record<string, DTCGTokenFile>,
   baselineSha: string,
 ): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  const store = tx.objectStore(STORE_NAME);
-  const data: DraftData = {
-    projectId,
-    tokenFiles,
-    baselineSha,
-    savedAt: Date.now(),
-  };
-  store.put(data);
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const data: DraftData = {
+      projectId,
+      tokenFiles,
+      baselineSha,
+      savedAt: Date.now(),
+    };
+    store.put(data);
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => {
+        resetConnection();
+        reject(tx.error);
+      };
+    });
+  } catch (error) {
+    resetConnection();
+    throw error;
+  }
 }
 
 export async function loadDraft(projectId: string): Promise<DraftData | null> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, "readonly");
-  const store = tx.objectStore(STORE_NAME);
-  const request = store.get(projectId);
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject(request.error);
-  });
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.get(projectId);
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => {
+        resetConnection();
+        reject(request.error);
+      };
+    });
+  } catch (error) {
+    resetConnection();
+    throw error;
+  }
 }
 
 export async function clearDraft(projectId: string): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  const store = tx.objectStore(STORE_NAME);
-  store.delete(projectId);
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    store.delete(projectId);
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => {
+        resetConnection();
+        reject(tx.error);
+      };
+    });
+  } catch (error) {
+    resetConnection();
+    throw error;
+  }
 }
 
 export async function hasDraft(projectId: string): Promise<boolean> {

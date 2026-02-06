@@ -18,6 +18,7 @@ export function CanvasEditor() {
     store.getState().activeTool,
   );
   const [pageNodes, setPageNodes] = useState<DesignNode[]>([]);
+  const [allNodes, setAllNodes] = useState<Map<string, DesignNode>>(new Map());
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedNode, setSelectedNode] = useState<DesignNode | null>(null);
 
@@ -61,6 +62,7 @@ export function CanvasEditor() {
     const unsub = store.subscribe((state) => {
       setActiveTool(state.activeTool);
       setPageNodes(state.getCurrentPageNodes());
+      setAllNodes(state.nodes);
       setSelectedIds(new Set(state.selectedIds));
       const nodes = state.getSelectedNodes();
       setSelectedNode(nodes.length === 1 ? nodes[0] : null);
@@ -259,6 +261,7 @@ export function CanvasEditor() {
       canvasRef={canvasRef}
       activeTool={activeTool}
       pageNodes={pageNodes}
+      allNodes={allNodes}
       selectedIds={selectedIds}
       selectedNode={selectedNode}
       onSetTool={handleSetTool}

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 interface DialogPreviewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -7,6 +9,17 @@ export function DialogPreview({
   open,
   onOpenChange,
 }: Readonly<DialogPreviewProps>) {
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onOpenChange]);
+
   return (
     <div>
       <button
@@ -24,14 +37,10 @@ export function DialogPreview({
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Overlay */}
           <div
-            role="button"
-            tabIndex={0}
+            role="presentation"
             className="absolute inset-0"
             style={{ backgroundColor: "rgb(var(--colors-dialog-overlay))" }}
             onClick={() => onOpenChange(false)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") onOpenChange(false);
-            }}
           />
 
           {/* Dialog */}
