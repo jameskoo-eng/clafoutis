@@ -431,8 +431,14 @@ function showNextSteps(
     log.message(
       `  1. Edit ${producerAnswers.tokens}/colors/primitives.json with your design tokens`,
     );
-    log.message("  2. Run: npx clafoutis generate");
-    log.message("  3. Push to GitHub - releases will be created automatically");
+    if (producerAnswers.workflow) {
+      log.message(
+        "  2. Push to GitHub - the workflow will generate outputs and create a release automatically",
+      );
+    } else {
+      log.message("  2. Run: npx clafoutis generate");
+      log.message("  3. Push to GitHub to share your design system");
+    }
   } else {
     log.message("  1. Run: npx clafoutis sync");
   }

@@ -29,9 +29,10 @@ design and code stay in sync
 ```bash
 npx clafoutis init --producer
 # Edit tokens/colors/primitives.json
-npx clafoutis generate
-git push  # GitHub Action creates release automatically
+git push  # GitHub Action runs generate and creates release automatically
 ```
+
+> If you opted out of the GitHub workflow during init, run `npx clafoutis generate` locally before pushing.
 
 **Consumers** (application developers) pin to a version and sync:
 

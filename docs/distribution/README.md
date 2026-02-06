@@ -2,7 +2,7 @@
 
 Clafoutis provides a GitOps workflow for design token distribution:
 
-- **Producers** define tokens in JSON, run `clafoutis generate`, and publish via GitHub Releases
+- **Producers** define tokens in JSON, push to GitHub, and the workflow generates outputs and publishes via GitHub Releases
 - **Consumers** pin to a version, run `clafoutis sync`, and commit the output
 
 Tokens are statically cached and version controlled - no runtime dependencies, no build-time network requests (after initial sync).
@@ -16,7 +16,7 @@ Tokens are statically cached and version controlled - no runtime dependencies, n
 │  tokens/colors/primitives.json    (source of truth)         │
 │           │                                                  │
 │           ▼                                                  │
-│  npx clafoutis generate           (transform)               │
+│  GitHub Action: clafoutis generate (transform)               │
 │           │                                                  │
 │           ▼                                                  │
 │  build/*                          (platform outputs)        │
@@ -67,13 +67,12 @@ npx clafoutis init --producer
 # Edit your tokens
 # tokens/colors/primitives.json
 
-# Generate outputs
-npx clafoutis generate
-
-# Push to GitHub - releases are created automatically
+# Push to GitHub - the workflow runs generate and creates a release automatically
 git add . && git commit -m "Initial design system"
 git push origin main
 ```
+
+> If you opted out of the GitHub workflow during init, run `npx clafoutis generate` locally before pushing.
 
 ### Producer Config: .clafoutis/producer.json
 
