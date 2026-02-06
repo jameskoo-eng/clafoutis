@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 # Load .env if present, then NVM and Node from .nvmrc (install if missing)
-ENV_LOADER := set -a && ([ -f .env ] && . ./.env || true) && set +a && export NVM_DIR="$${NVM_DIR:-$$HOME/.nvm}" && [ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh" && nvm install && nvm use
+ENV_LOADER := set -a && [ -f .env ] && . ./.env && set +a && export NVM_DIR="$${NVM_DIR:-$$HOME/.nvm}" && [ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh" && nvm install && nvm use
 
 # --- Package alias resolver ---
 # Maps short names to pnpm workspace filter names.
