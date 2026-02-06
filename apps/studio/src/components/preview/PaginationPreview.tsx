@@ -9,7 +9,9 @@ export function PaginationPreview({
   totalPages,
   onPageChange,
 }: Readonly<PaginationProps>) {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const safeTotal = Math.max(1, Number(totalPages) || 0);
+  const safePage = Math.max(1, Math.min(safeTotal, Number(currentPage) || 0));
+  const pages = Array.from({ length: safeTotal }, (_, i) => i + 1);
 
   return (
     <nav className="flex items-center gap-1">
@@ -18,13 +20,13 @@ export function PaginationPreview({
         style={{
           borderColor: "rgb(var(--colors-pagination-item-border))",
           color:
-            currentPage === 1
+            safePage === 1
               ? "rgb(var(--colors-pagination-item-disabled-text))"
               : "rgb(var(--colors-pagination-item-text))",
-          cursor: currentPage === 1 ? "not-allowed" : "pointer",
+          cursor: safePage === 1 ? "not-allowed" : "pointer",
         }}
-        disabled={currentPage === 1}
-        onClick={() => onPageChange(currentPage - 1)}
+        disabled={safePage === 1}
+        onClick={() => onPageChange(safePage - 1)}
       >
         Prev
       </button>
@@ -35,22 +37,22 @@ export function PaginationPreview({
           className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
           style={{
             backgroundColor:
-              page === currentPage
+              page === safePage
                 ? "rgb(var(--colors-pagination-active-bg))"
                 : "rgb(var(--colors-pagination-item-bg))",
             color:
-              page === currentPage
+              page === safePage
                 ? "rgb(var(--colors-pagination-active-text))"
                 : "rgb(var(--colors-pagination-item-text))",
           }}
           onMouseEnter={(e) => {
-            if (page !== currentPage) {
+            if (page !== safePage) {
               e.currentTarget.style.backgroundColor =
                 "rgb(var(--colors-pagination-item-hover))";
             }
           }}
           onMouseLeave={(e) => {
-            if (page !== currentPage) {
+            if (page !== safePage) {
               e.currentTarget.style.backgroundColor =
                 "rgb(var(--colors-pagination-item-bg))";
             }
@@ -66,13 +68,13 @@ export function PaginationPreview({
         style={{
           borderColor: "rgb(var(--colors-pagination-item-border))",
           color:
-            currentPage === totalPages
+            safePage === safeTotal
               ? "rgb(var(--colors-pagination-item-disabled-text))"
               : "rgb(var(--colors-pagination-item-text))",
-          cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+          cursor: safePage === safeTotal ? "not-allowed" : "pointer",
         }}
-        disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
+        disabled={safePage === safeTotal}
+        onClick={() => onPageChange(safePage + 1)}
       >
         Next
       </button>

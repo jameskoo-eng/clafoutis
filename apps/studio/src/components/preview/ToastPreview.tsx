@@ -45,6 +45,8 @@ function Toast({
       </div>
       {onClose && (
         <button
+          type="button"
+          aria-label="Close toast"
           className="text-sm"
           style={{ color: "rgb(var(--colors-toast-close))" }}
           onClick={onClose}

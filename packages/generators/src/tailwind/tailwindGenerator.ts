@@ -13,8 +13,8 @@ import tinycolor from "tinycolor2";
 
 // 0) CLEAN OUTPUT DIRECTORY
 // ----------------------------------------------------------------------------
-function cleanDist(): void {
-  const distDir = path.resolve("build/tailwind");
+function cleanDist(cwd: string): void {
+  const distDir = path.resolve(cwd, "build/tailwind");
   try {
     fs.rmSync(distDir, { recursive: true, force: true });
     logger.info(`Removed ${distDir}`);
@@ -336,15 +336,18 @@ export default {
 
 // 5) BUILD SCRIPTS
 // ----------------------------------------------------------------------------
-async function main(): Promise<void> {
-  cleanDist();
+async function main(cwd: string = process.cwd()): Promise<void> {
+  const resolvedCwd = path.resolve(cwd);
+  const buildPath = path.join(resolvedCwd, "build", "tailwind") + "/";
+
+  cleanDist(resolvedCwd);
 
   // Base styles
   {
     console.log("Building base theme...");
     const SD = new StyleDictionary({
       source: [
-        "tokens/**/!(*.dark).json", // all .json files that do NOT end with .dark.json
+        path.join(resolvedCwd, "tokens/**/!(*.dark).json"), // all .json files that do NOT end with .dark.json
       ],
       log: {
         warnings: logWarningLevels.warn, // 'warn' | 'error' | 'disabled'
@@ -357,7 +360,7 @@ async function main(): Promise<void> {
         // 1) CSS output
         base: {
           transformGroup: "custom/css",
-          buildPath: "build/tailwind/",
+          buildPath,
           files: [
             {
               destination: "base.css",
@@ -380,7 +383,7 @@ async function main(): Promise<void> {
         tailwind: {
           transformGroup: "js",
           transforms: tailwindTransforms,
-          buildPath: "build/tailwind/",
+          buildPath,
           files: [
             {
               destination: "tailwind.base.js",
@@ -411,8 +414,8 @@ async function main(): Promise<void> {
       source: [
         // Order matters! Load base tokens first for reference resolution,
         // then dark tokens to override with dark-specific values
-        "tokens/**/!(*.dark).json",
-        "tokens/**/*.dark.json",
+        path.join(resolvedCwd, "tokens/**/!(*.dark).json"),
+        path.join(resolvedCwd, "tokens/**/*.dark.json"),
       ],
       log: {
         verbosity: logVerbosityLevels.default,
@@ -422,7 +425,7 @@ async function main(): Promise<void> {
         base: {
           transformGroup: "css",
           transforms: defaultTransforms,
-          buildPath: "build/tailwind/",
+          buildPath,
           files: [
             {
               destination: "dark.css",

@@ -153,6 +153,6 @@ describe('typography spot checks', () => {
     expect(parsed.fontFamily.base.$type).toBe('fontFamily');
     expect(parsed.fontSize.base.$type).toBe('dimension');
     expect(parsed.fontWeight.bold.$type).toBe('fontWeight');
-    expect(parsed.lineHeight.normal.$type).toBe('dimension');
+    expect(parsed.lineHeight.normal.$type).toBe('number');
   });
 });

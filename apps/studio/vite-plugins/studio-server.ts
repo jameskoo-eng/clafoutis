@@ -1,5 +1,6 @@
 import { generate } from '@clafoutis/generators/tailwind';
 import fs from 'fs';
+import type { IncomingMessage } from 'http';
 import os from 'os';
 import path from 'path';
 import type { Plugin } from 'vite';
@@ -7,11 +8,26 @@ import type { Plugin } from 'vite';
 let cachedCSS: { baseCSS: string; darkCSS: string } | null = null;
 let generateLock: Promise<void> = Promise.resolve();
 
-function readBody(req: import('http').IncomingMessage): Promise<string> {
-  return new Promise((resolve) => {
+function readBody(req: IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
     let body = '';
-    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
-    req.on('end', () => resolve(body));
+    const onData = (chunk: Buffer) => { body += chunk.toString(); };
+    const onEnd = () => {
+      cleanup();
+      resolve(body);
+    };
+    const onError = (err: Error) => {
+      cleanup();
+      reject(err);
+    };
+    const cleanup = () => {
+      req.off('data', onData);
+      req.off('end', onEnd);
+      req.off('error', onError);
+    };
+    req.on('data', onData);
+    req.on('end', onEnd);
+    req.on('error', onError);
   });
 }
 
@@ -25,10 +41,8 @@ async function runGeneration(tokenFiles: Record<string, unknown>): Promise<{ bas
     fs.writeFileSync(fullPath, JSON.stringify(content, null, 2));
   }
 
-  const origCwd = process.cwd();
   try {
-    process.chdir(workDir);
-    await generate();
+    await generate(workDir);
 
     const buildDir = path.join(workDir, 'build', 'tailwind');
     const baseCSS = fs.existsSync(path.join(buildDir, 'base.css'))
@@ -41,7 +55,6 @@ async function runGeneration(tokenFiles: Record<string, unknown>): Promise<{ bas
     cachedCSS = { baseCSS, darkCSS };
     return { baseCSS, darkCSS };
   } finally {
-    process.chdir(origCwd);
     fs.rmSync(workDir, { recursive: true, force: true });
   }
 }
