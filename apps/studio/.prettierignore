@@ -19,3 +19,8 @@ coverage/
 
 # Generated files
 *.gen.ts
+**/generated/**
+src/generated/**
+
+# TanStack Query cache
+.tanstack/
