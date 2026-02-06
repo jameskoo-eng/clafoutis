@@ -170,7 +170,7 @@ function isValidJSKey(key: string): boolean {
  * @param {number} indent - The current indentation level
  * @returns {string} JavaScript literal representation
  */
-function toJSLiteral(value: any, indent = 2): string {
+function toJSLiteral(value: unknown, indent = 2): string {
   if (typeof value === "string") {
     return JSON.stringify(value);
   }
@@ -228,7 +228,7 @@ function setNestedProperty(
  */
 StyleDictionary.registerFormat({
   name: "css/index-file",
-  format: async function ({ file, options, dictionary }) {
+  format: async function ({ file, options }) {
     const header = await fileHeader({ file, options });
 
     const content = `
@@ -298,7 +298,7 @@ export default ${partialStr};`
  */
 StyleDictionary.registerFormat({
   name: "tailwind/config",
-  format: async function ({ file, options, dictionary }) {
+  format: async function ({ file, options }) {
     const header = await fileHeader({ file, options });
 
     return (

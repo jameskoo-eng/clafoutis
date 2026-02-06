@@ -65,7 +65,7 @@ describe('E2E: mock-design-system → mock-frontend', () => {
       'utf-8'
     );
 
-    expect(baseCss).toContain('--color-primary-500');
+    expect(baseCss).toContain('--colors-button-primary-bg');
     expect(tailwindTokens).toContain('darkMode');
     expect(tailwindTokens).toContain('colors');
   });
