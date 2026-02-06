@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 
 import { AppLayout } from "@/components/layout/AppLayout";
 import DashboardView from "@/components/views/DashboardView";
+import { useAlerts } from "@/contexts/AlertProvider";
 import { useAuth } from "@/contexts/AuthProvider";
 import { listUserRepos, parseRepoInput } from "@/lib/github-api";
 import { importFromFiles } from "@/lib/local-import";
@@ -20,6 +21,7 @@ export function Dashboard() {
     logout,
     isLoading: authLoading,
   } = useAuth();
+  const { addAlert } = useAlerts();
   const navigate = useNavigate();
   const [publicRepoInput, setPublicRepoInput] = useState("");
   const [publicRepoError, setPublicRepoError] = useState("");
@@ -58,26 +60,41 @@ export function Dashboard() {
     input.multiple = true;
     input.onchange = async () => {
       if (input.files) {
-        await importFromFiles(input.files);
+        try {
+          await importFromFiles(input.files);
+          navigate({
+            to: "/projects/$projectId/tokens",
+            params: { projectId: "local" },
+          });
+        } catch (error) {
+          console.error("Failed to import files:", error);
+          addAlert(
+            error instanceof Error
+              ? error.message
+              : "Failed to import files. Please check the file format and try again.",
+            "error",
+          );
+        }
+      }
+    };
+    input.click();
+  }, [navigate, addAlert]);
+
+  const handleCreateFromTemplate = useCallback(
+    async (template: TokenTemplate) => {
+      try {
+        getTokenStore().getState().loadTokens(template.files);
+        await regeneratePreview(template.files);
         navigate({
           to: "/projects/$projectId/tokens",
           params: { projectId: "local" },
         });
+      } catch (error) {
+        console.error("Failed to create project from template:", error);
+        addAlert("Failed to create project from template.", "error");
       }
-    };
-    input.click();
-  }, [navigate]);
-
-  const handleCreateFromTemplate = useCallback(
-    async (template: TokenTemplate) => {
-      getTokenStore().getState().loadTokens(template.files);
-      await regeneratePreview(template.files);
-      navigate({
-        to: "/projects/$projectId/tokens",
-        params: { projectId: "local" },
-      });
     },
-    [navigate],
+    [navigate, addAlert],
   );
 
   const handleSignInThenBrowse = useCallback(async () => {

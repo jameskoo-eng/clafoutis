@@ -1,6 +1,6 @@
 import { serializeTokenFile } from "@clafoutis/studio-core";
 import { useParams } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import PublishView from "@/components/views/PublishView";
 import { useAuth } from "@/contexts/AuthProvider";
@@ -19,9 +19,21 @@ export function Publish() {
   );
   const [error, setError] = useState("");
 
-  const diffs = useMemo(() => store.getState().getDiff(), [store]);
+  const [diffs, setDiffs] = useState(() => store.getState().getDiff());
+
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      setDiffs(store.getState().getDiff());
+    });
+    return unsubscribe;
+  }, [store]);
   const isLocal = projectId === "local";
-  const [owner, repo] = isLocal ? ["", ""] : projectId.split("--");
+  const [owner, repo] = (() => {
+    if (isLocal) return ["", ""];
+    const idx = projectId.indexOf("--");
+    if (idx === -1) return ["", ""];
+    return [projectId.slice(0, idx), projectId.slice(idx + 2)];
+  })();
 
   const handlePush = async () => {
     if (!accessToken || !owner || !repo) return;

@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useId, useRef } from "react";
 
 interface SliderProps {
   value: number;
@@ -16,6 +16,7 @@ function Slider({
   label,
 }: Readonly<SliderProps>) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const labelId = useId();
 
   const handleInteraction = useCallback(
     (clientX: number) => {
@@ -41,12 +42,16 @@ function Slider({
     [handleInteraction],
   );
 
-  const pct = ((value - min) / (max - min)) * 100;
+  const pct =
+    max === min
+      ? 0
+      : Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <span
+          id={labelId}
           className="text-sm font-medium"
           style={{ color: "rgb(var(--colors-text-primary))" }}
         >
@@ -62,6 +67,7 @@ function Slider({
       <div
         ref={trackRef}
         role="slider"
+        aria-labelledby={labelId}
         tabIndex={0}
         aria-valuemin={min}
         aria-valuemax={max}
