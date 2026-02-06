@@ -1,8 +1,9 @@
 const BASE_URL = "https://api.github.com";
 
 function headers() {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) throw new Error("GITHUB_TOKEN environment variable is required");
+  const token = process.env.CLAFOUTIS_REPO_TOKEN;
+  if (!token)
+    throw new Error("CLAFOUTIS_REPO_TOKEN environment variable is required");
   return {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github+json",

@@ -24,7 +24,7 @@
     "src/templates/tokens/**/*.json"
   ],
   "scripts": {
-    "build": "tsup && cp -r src/templates/tokens dist/templates/",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
