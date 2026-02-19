@@ -25,7 +25,6 @@
       "$value": "32px"
     }
   },
-
   "borderRadius": {
     "none": {
       "$type": "dimension",
@@ -48,7 +47,6 @@
       "$value": "9999px"
     }
   },
-
   "maxWidth": {
     "container": {
       "$type": "dimension",

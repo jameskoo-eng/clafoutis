@@ -1,6 +1,7 @@
 import * as p from "@clack/prompts";
 import { Command } from "commander";
 
+import { formatCommand } from "./commands/format";
 import { generateCommand } from "./commands/generate";
 import { initCommand } from "./commands/init";
 import { syncCommand } from "./commands/sync";
@@ -27,7 +28,7 @@ function displayError(err: ClafoutisError): void {
  * Wraps a command action with error handling for ClafoutisError instances.
  */
 function withErrorHandling<T>(
-  fn: (options: T) => Promise<void>,
+  fn: (options: T) => void | Promise<void>,
 ): (options: T) => Promise<void> {
   return async (options: T): Promise<void> => {
     try {
@@ -124,5 +125,16 @@ program
   .option("--dry-run", "Preview changes without writing files")
   .option("--non-interactive", "Skip prompts, use defaults or flags")
   .action(withErrorHandling(initCommand));
+
+program
+  .command("format")
+  .description("Format token JSON files for consistent formatting")
+  .option("-t, --tokens <path>", "Token directory path", "./tokens")
+  .option(
+    "--check",
+    "Check formatting without modifying files (fails if unformatted)",
+  )
+  .option("--dry-run", "Preview changes without writing files")
+  .action(withErrorHandling(formatCommand));
 
 program.parse();

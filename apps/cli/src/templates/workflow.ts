@@ -29,6 +29,9 @@ jobs:
       - name: Install Clafoutis
         run: npm install -D @clafoutis/cli
 
+      - name: Check token file formatting
+        run: npx clafoutis format --tokens tokens --check
+
       - name: Generate tokens
         run: npx clafoutis generate
 

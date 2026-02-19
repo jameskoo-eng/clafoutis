@@ -1,6 +1,5 @@
 {
   "$type": "typography",
-
   "fontFamily": {
     "base": {
       "$type": "fontFamily",
@@ -15,7 +14,6 @@
       "$value": "Fira Code, Courier New, monospace"
     }
   },
-
   "fontSize": {
     "xs": {
       "$type": "dimension",
@@ -46,7 +44,6 @@
       "$value": "30px"
     }
   },
-
   "fontWeight": {
     "normal": {
       "$type": "fontWeight",
@@ -65,7 +62,6 @@
       "$value": "700"
     }
   },
-
   "lineHeight": {
     "normal": {
       "$type": "number",
@@ -80,7 +76,6 @@
       "$value": "1"
     }
   },
-
   "letterSpacing": {
     "normal": {
       "$type": "dimension",
