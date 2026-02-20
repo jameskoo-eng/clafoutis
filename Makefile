@@ -6,6 +6,7 @@ ENV_LOADER := set -a && [ -f .env ] && . ./.env && set +a && export NVM_DIR="$${
 # Maps short names to pnpm workspace filter names.
 # Usage: make build studio  |  make test studio-core  |  make start studio
 resolve_pkg = $(if $(filter studio,$(1)),@clafoutis/studio,\
+              $(if $(filter server,$(1)),@clafoutis/server,\
               $(if $(filter studio-core,$(1)),@clafoutis/studio-core,\
               $(if $(filter studio-mcp,$(1)),@clafoutis/studio-mcp,\
               $(if $(filter cli,$(1)),@clafoutis/cli,\
@@ -16,12 +17,12 @@ resolve_pkg = $(if $(filter studio,$(1)),@clafoutis/studio,\
               $(if $(filter tsup-config,$(1)),@clafoutis/tsup-config,\
               $(if $(filter typescript-config,$(1)),@clafoutis/typescript-config,\
               $(if $(filter vitest-config,$(1)),@clafoutis/vitest-config,\
-              @clafoutis/$(1))))))))))))
+              @clafoutis/$(1)))))))))))))
 
 # Grab everything after the first word so "make dev studio" gives PKG=studio
 SUBCMD := $(word 2,$(MAKECMDGOALS))
 
-.PHONY: help init install build-all lint-check lint-fix format-check format-fix check-all fix-all type-check test-all clean turbo-clean pre-commit dev build test start lint type storybook test-storybook
+.PHONY: help init install build-all lint-check lint-fix format-check format-fix check-all fix-all type-check test-all clean turbo-clean pre-commit dev build test start lint format type storybook test-storybook
 
 help:
 	@echo "Usage: make [target] [package]"
@@ -37,11 +38,13 @@ help:
 	@echo "  make build <pkg>  - build a single package"
 	@echo "  make test <pkg>   - run tests for a single package"
 	@echo "  make lint <pkg>   - lint a single package"
+	@echo "  make format <pkg> - format-check a single package"
+	@echo "  make format-fix <pkg> - format-write a single package"
 	@echo "  make type <pkg>   - type-check a single package"
 	@echo "  make storybook <pkg> - run Storybook dev server"
 	@echo "  make test-storybook <pkg> - run Storybook Playwright tests"
 	@echo ""
-	@echo "  Packages: studio | studio-core | studio-mcp | cli | generators | shared"
+	@echo "  Packages: studio | server | studio-core | studio-mcp | cli | generators | shared"
 	@echo ""
 	@echo "  Examples:"
 	@echo "    make start studio      - start the Studio dev server"
@@ -116,6 +119,14 @@ else
 endif
 .PHONY: lint
 
+format:
+ifndef SUBCMD
+	@echo "Usage: make format <package>"; exit 1
+else
+	$(ENV_LOADER) && pnpm --filter $(call resolve_pkg,$(SUBCMD)) format:check
+endif
+.PHONY: format
+
 type:
 ifndef SUBCMD
 	@echo "Usage: make type <package>"; exit 1
@@ -159,7 +170,11 @@ format-check:
 .PHONY: format-check
 
 format-fix:
+ifdef SUBCMD
+	$(ENV_LOADER) && pnpm --filter $(call resolve_pkg,$(SUBCMD)) format:write
+else
 	$(ENV_LOADER) && pnpm turbo format:write
+endif
 .PHONY: format-fix
 
 type-check:

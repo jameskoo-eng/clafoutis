@@ -39,7 +39,9 @@ export async function exchangeCodeForToken(
   codeVerifier: string,
   redirectUri: string,
 ): Promise<string> {
-  const response = await fetch("/__studio/oauth/token", {
+  const apiUrl = import.meta.env.VITE_API_URL || "";
+  const tokenUrl = `${apiUrl}/__studio/oauth/token`;
+  const response = await fetch(tokenUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

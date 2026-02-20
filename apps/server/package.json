@@ -1,24 +1,16 @@
 {
-  "name": "@clafoutis/shared",
+  "name": "@clafoutis/server",
+  "private": true,
   "version": "1.0.0",
-  "description": "Shared utilities for Clafoutis",
+  "description": "Studio backend server - OAuth proxy and token generation",
   "author": "Dessert Labs",
   "license": "BUSL-1.1",
   "type": "module",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist/**/*"
-  ],
   "scripts": {
+    "dev": "tsx watch src/index.ts",
     "build": "tsup",
-    "dev": "tsup --watch",
+    "start": "node dist/index.js",
     "lint:check": "eslint src",
     "lint:write": "eslint src --fix",
     "format:check": "prettier --check src",
@@ -27,11 +19,18 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "zod": "^3.24.0"
+    "@clafoutis/generators": "workspace:*",
+    "@clafoutis/shared": "workspace:*",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@clafoutis/eslint-config": "workspace:*",
     "@clafoutis/tsup-config": "workspace:*",
     "@clafoutis/typescript-config": "workspace:*",
-    "@types/node": "^22.15.27"
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.15.27",
+    "tsx": "^4.19.4"
   }
 }

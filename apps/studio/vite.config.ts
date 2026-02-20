@@ -5,8 +5,6 @@ import { fileURLToPath } from 'url';
 import type { PluginOption } from 'vite';
 import { defineConfig } from 'vite';
 
-import { studioServerPlugin } from './vite-plugins/studio-server';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
@@ -16,7 +14,6 @@ export default defineConfig({
       generatedRouteTree: './src/generated/routeTree.gen.ts',
     }) as PluginOption,
     react() as PluginOption,
-    studioServerPlugin() as PluginOption,
   ],
   resolve: {
     alias: {
@@ -25,6 +22,12 @@ export default defineConfig({
   },
   server: {
     port: 5174,
+    proxy: {
+      '/__studio': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
   },
   base: '/',
 });
