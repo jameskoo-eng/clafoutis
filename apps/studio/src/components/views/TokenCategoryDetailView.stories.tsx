@@ -34,6 +34,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const noop = () => {};
+const noopAsync = async () => {};
+const noopAsyncString = async () => "{}";
 
 const mockTokens: ResolvedToken[] = [
   {
@@ -123,13 +125,22 @@ export const Default: Story = {
     canRedo: false,
     dirtyCount: 0,
     tokenFiles: ["colors/primitives.json", "colors/semantics.json"],
+    fileTokenCounts: {
+      "colors/primitives.json": 6,
+      "colors/semantics.json": 0,
+    },
+    selectedTokenFile: "all",
     onSearchChange: noop,
+    onSelectedTokenFileChange: noop,
     onUpdateToken: noop,
     onInputDirty: noop,
     onSaveAll: noop,
     onUndo: noop,
     onRedo: noop,
     onAddToken: noop,
+    onCopyTokenFileJSON: noopAsync,
+    onGetTokenFileJSON: noopAsyncString,
+    onImportTokenFileJSON: noopAsync,
   },
 };
 

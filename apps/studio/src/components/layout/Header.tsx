@@ -9,6 +9,7 @@ interface HeaderProps {
   onLogin: () => void;
   onLogout: () => void;
   onOpenHelp: () => void;
+  actions?: React.ReactNode;
 }
 
 export function Header({
@@ -17,6 +18,7 @@ export function Header({
   onLogin,
   onLogout,
   onOpenHelp,
+  actions,
 }: Readonly<HeaderProps>) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-studio-border bg-studio-bg px-4">
@@ -25,6 +27,7 @@ export function Header({
       </Link>
 
       <div className="flex items-center gap-3">
+        {actions}
         <button
           onClick={onOpenHelp}
           className="rounded-md p-2 text-studio-text-muted hover:bg-studio-bg-tertiary hover:text-studio-text"

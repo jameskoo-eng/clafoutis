@@ -217,6 +217,8 @@ export interface TokenState {
 
   createTokenFile: (filePath: string) => void;
   deleteTokenFile: (filePath: string) => void;
+  exportTokenFile: (filePath: string) => DTCGTokenFile | null;
+  replaceTokenFile: (filePath: string, file: DTCGTokenFile) => void;
   renameTokenGroup: (oldPath: string, newPath: string) => void;
   moveToken: (tokenPath: string, targetFilePath: string) => void;
   getTokenGroups: () => TokenGroupNode[];
@@ -576,6 +578,34 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
       set({
         tokenFiles,
         resolvedTokens: resolveAll(tokenFiles, get().activeTheme),
+        dirtyFiles,
+        undoStack: trimStack(state.undoStack, snapshot),
+        redoStack: [],
+      });
+    },
+
+    exportTokenFile: (filePath) => {
+      const file = get().tokenFiles.get(filePath);
+      return file ? deepCloneFile(file) : null;
+    },
+
+    replaceTokenFile: (filePath, file) => {
+      const state = get();
+      const snapshot = pushSnapshot(state);
+      const tokenFiles = new Map(state.tokenFiles);
+      tokenFiles.set(filePath, deepCloneFile(file));
+      const themes = detectThemes(Array.from(tokenFiles.keys()));
+      const activeTheme = themes.includes(state.activeTheme)
+        ? state.activeTheme
+        : "light";
+      const dirtyFiles = new Set(state.dirtyFiles);
+      dirtyFiles.add(filePath);
+
+      set({
+        tokenFiles,
+        themes,
+        activeTheme,
+        resolvedTokens: resolveAll(tokenFiles, activeTheme),
         dirtyFiles,
         undoStack: trimStack(state.undoStack, snapshot),
         redoStack: [],

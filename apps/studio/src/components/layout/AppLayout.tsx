@@ -11,6 +11,7 @@ interface AppLayoutProps {
   onLogin: () => void;
   onLogout: () => void;
   onOpenHelp: () => void;
+  headerActions?: React.ReactNode;
 }
 
 export function AppLayout({
@@ -20,6 +21,7 @@ export function AppLayout({
   onLogin,
   onLogout,
   onOpenHelp,
+  headerActions,
 }: Readonly<AppLayoutProps>) {
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-studio-bg">
@@ -29,6 +31,7 @@ export function AppLayout({
         onLogin={onLogin}
         onLogout={onLogout}
         onOpenHelp={onOpenHelp}
+        actions={headerActions}
       />
       <div className="flex flex-1 flex-col overflow-hidden">{children}</div>
     </div>
