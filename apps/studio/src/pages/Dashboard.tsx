@@ -138,7 +138,7 @@ export function Dashboard() {
         onShowRepos={() => setShowRepos(true)}
         onOpenRepo={(owner, name) => {
           const projectId = `${owner}--${name}`;
-          setProjectTokensPath(projectId, "tokens");
+          setProjectTokensPath(projectId, publicRepoSubfolder);
           navigate({
             to: "/projects/$projectId/tokens",
             params: { projectId },
