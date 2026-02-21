@@ -1,5 +1,11 @@
 # @clafoutis/cli
 
+## 1.2.1
+
+### Patch Changes
+
+- d2a7d2a: Add monorepo-friendly `--cwd` support across CLI commands and update producer workflow scaffolding to commit `build/**` artifacts before creating a GitHub release.
+
 ## 1.2.0
 
 ### Minor Changes
