@@ -199,6 +199,7 @@ export interface TokenState {
   redoStack: TokenSnapshot[];
 
   loadTokens: (files: Record<string, DTCGTokenFile>) => void;
+  loadDraftTokens: (files: Record<string, DTCGTokenFile>) => void;
   updateToken: (path: string, value: unknown, theme?: string) => void;
   addToken: (
     path: string,
@@ -227,6 +228,27 @@ export interface TokenState {
   redoTokenChange: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
+}
+
+function collectDirtyFiles(
+  tokenFiles: Map<string, DTCGTokenFile>,
+  baseline: Map<string, DTCGTokenFile>,
+): Set<string> {
+  const dirtyFiles = new Set<string>();
+  const allPaths = new Set([
+    ...Array.from(tokenFiles.keys()),
+    ...Array.from(baseline.keys()),
+  ]);
+
+  for (const filePath of allPaths) {
+    const current = tokenFiles.get(filePath);
+    const base = baseline.get(filePath);
+    if (JSON.stringify(current) !== JSON.stringify(base)) {
+      dirtyFiles.add(filePath);
+    }
+  }
+
+  return dirtyFiles;
 }
 
 function getFileTheme(filePath: string): string | null {
@@ -328,6 +350,37 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
         dirtyFiles: new Set(),
         themes,
         activeTheme: "light",
+        undoStack: [],
+        redoStack: [],
+      });
+    },
+
+    loadDraftTokens: (files) => {
+      const state = get();
+      const tokenFiles = new Map(Object.entries(files));
+      const baseline =
+        state.baseline.size > 0
+          ? state.baseline
+          : new Map(
+              Array.from(tokenFiles.entries()).map(([k, v]) => [
+                k,
+                deepCloneFile(v),
+              ]),
+            );
+      const themes = detectThemes(Array.from(tokenFiles.keys()));
+      const activeTheme = themes.includes(state.activeTheme)
+        ? state.activeTheme
+        : "light";
+      const resolvedTokens = resolveAll(tokenFiles, activeTheme);
+      const dirtyFiles = collectDirtyFiles(tokenFiles, baseline);
+
+      set({
+        tokenFiles,
+        baseline,
+        resolvedTokens,
+        dirtyFiles,
+        themes,
+        activeTheme,
         undoStack: [],
         redoStack: [],
       });
