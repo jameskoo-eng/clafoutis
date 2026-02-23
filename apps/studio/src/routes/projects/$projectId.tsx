@@ -90,7 +90,7 @@ function ProjectLayoutRoute() {
           const draft = await loadDraft(projectId);
           if (draft && !cancelled) {
             const store = getTokenStore();
-            store.getState().loadTokens(draft.tokenFiles);
+            store.getState().loadDraftTokens(draft.tokenFiles);
             await regeneratePreview(draft.tokenFiles);
             const draftTokenCount = store.getState().resolvedTokens.length;
             setTokenCount(draftTokenCount);
@@ -127,6 +127,10 @@ function ProjectLayoutRoute() {
   const isRemoteProject = parseProjectId(projectId) !== null;
   const handleDiscardChanges = useCallback(async () => {
     if (!isRemoteProject || discardingChanges) return;
+    const confirmed = globalThis.confirm(
+      "Discard all unsaved changes and reload tokens from GitHub?",
+    );
+    if (!confirmed) return;
     setDiscardingChanges(true);
     try {
       await clearDraft(projectId);
