@@ -529,38 +529,56 @@ export const createTokenStore = (initialState?: Partial<TokenState>) => {
       const { tokenFiles, baseline } = get();
       const diffs: TokenDiff[] = [];
 
-      const currentFlat = new Map<string, unknown>();
-      for (const [, file] of tokenFiles) {
-        for (const { path, token } of flattenTokens(file, "")) {
-          currentFlat.set(path, token.$value);
+      const currentFlat = new Map<
+        string,
+        { path: string; filePath: string; value: unknown }
+      >();
+      for (const [filePath, file] of tokenFiles) {
+        for (const { path, token } of flattenTokens(file, filePath)) {
+          const key = `${filePath}::${path}`;
+          currentFlat.set(key, { path, filePath, value: token.$value });
         }
       }
 
-      const baselineFlat = new Map<string, unknown>();
-      for (const [, file] of baseline) {
-        for (const { path, token } of flattenTokens(file, "")) {
-          baselineFlat.set(path, token.$value);
+      const baselineFlat = new Map<
+        string,
+        { path: string; filePath: string; value: unknown }
+      >();
+      for (const [filePath, file] of baseline) {
+        for (const { path, token } of flattenTokens(file, filePath)) {
+          const key = `${filePath}::${path}`;
+          baselineFlat.set(key, { path, filePath, value: token.$value });
         }
       }
 
-      for (const [path, value] of currentFlat) {
-        if (!baselineFlat.has(path)) {
-          diffs.push({ path, type: "added", after: value });
+      for (const [key, current] of currentFlat) {
+        const baselineEntry = baselineFlat.get(key);
+        const displayPath = `${current.filePath}:${current.path}`;
+        if (!baselineEntry) {
+          diffs.push({
+            path: displayPath,
+            type: "added",
+            after: current.value,
+          });
         } else if (
-          JSON.stringify(value) !== JSON.stringify(baselineFlat.get(path))
+          JSON.stringify(current.value) !== JSON.stringify(baselineEntry.value)
         ) {
           diffs.push({
-            path,
+            path: displayPath,
             type: "modified",
-            before: baselineFlat.get(path),
-            after: value,
+            before: baselineEntry.value,
+            after: current.value,
           });
         }
       }
 
-      for (const [path, value] of baselineFlat) {
-        if (!currentFlat.has(path)) {
-          diffs.push({ path, type: "removed", before: value });
+      for (const [key, baselineEntry] of baselineFlat) {
+        if (!currentFlat.has(key)) {
+          diffs.push({
+            path: `${baselineEntry.filePath}:${baselineEntry.path}`,
+            type: "removed",
+            before: baselineEntry.value,
+          });
         }
       }
 
