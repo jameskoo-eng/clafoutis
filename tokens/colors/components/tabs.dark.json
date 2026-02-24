@@ -1,0 +1,58 @@
+{
+  "color": {
+    "tabs": {
+      "list": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.surface.tertiary}"
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.border.primary}"
+        }
+      },
+      "trigger": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.secondary}"
+        }
+      },
+      "triggerHover": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      },
+      "triggerActive": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.surface.primary}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        },
+        "shadow": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 1,
+            "blur": 2,
+            "spread": 0,
+            "color": "rgba(0, 0, 0, 0.2)"
+          }
+        }
+      },
+      "indicator": {
+        "$type": "color",
+        "$value": "{color.brand.accent}"
+      },
+      "content": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      }
+    }
+  }
+}

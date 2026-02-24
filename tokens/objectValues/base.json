@@ -1,73 +1,131 @@
 {
   "shadow": {
-    "elevationSm": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 1,
-        "blur": 4,
-        "spread": 0,
-        "color": "rgba(0, 0, 0, 0.06)"
+    "elevation": {
+      "sm": {
+        "$type": "shadow",
+        "$value": {
+          "x": 0,
+          "y": 1,
+          "blur": 4,
+          "spread": 0,
+          "color": "rgba(0, 0, 0, 0.06)"
+        }
+      },
+      "md": {
+        "$type": "shadow",
+        "$value": {
+          "x": 0,
+          "y": 4,
+          "blur": 8,
+          "spread": 0,
+          "color": "rgba(0, 0, 0, 0.08)"
+        }
+      },
+      "lg": {
+        "$type": "shadow",
+        "$value": {
+          "x": 0,
+          "y": 8,
+          "blur": 16,
+          "spread": 0,
+          "color": "rgba(0, 0, 0, 0.12)"
+        }
       }
     },
-    "glowPink": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 0,
-        "blur": 15,
-        "spread": 0,
-        "color": "rgba(253, 60, 173, 0.5)"
-      }
-    },
-    "glowPinkSm": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 0,
-        "blur": 10,
-        "spread": 0,
-        "color": "rgba(253, 60, 173, 0.3)"
-      }
-    },
-    "glowPinkMd": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 0,
-        "blur": 32,
-        "spread": 0,
-        "color": "rgba(253, 60, 173, 0.22)"
-      }
-    },
-    "glowPinkLg": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 0,
-        "blur": 30,
-        "spread": 0,
-        "color": "rgba(253, 60, 173, 0.35)"
-      }
-    },
-    "glowPinkIntense": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 0,
-        "blur": 8,
-        "spread": 0,
-        "color": "rgba(253, 60, 173, 0.8)"
-      }
-    },
-    "glowSuccess": {
-      "$type": "shadow",
-      "$value": {
-        "x": 0,
-        "y": 0,
-        "blur": 8,
-        "spread": 0,
-        "color": "rgba(32, 128, 77, 0.3)"
+    "glow": {
+      "pink": {
+        "sm": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 10,
+            "spread": 0,
+            "color": "rgba(253, 60, 173, 0.3)"
+          }
+        },
+        "md": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 15,
+            "spread": 0,
+            "color": "rgba(253, 60, 173, 0.5)"
+          }
+        },
+        "lg": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 30,
+            "spread": 0,
+            "color": "rgba(253, 60, 173, 0.35)"
+          }
+        },
+        "xl": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 32,
+            "spread": 0,
+            "color": "rgba(253, 60, 173, 0.22)"
+          }
+        },
+        "intense": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 8,
+            "spread": 0,
+            "color": "rgba(253, 60, 173, 0.8)"
+          }
+        }
+      },
+      "success": {
+        "$type": "shadow",
+        "$value": {
+          "x": 0,
+          "y": 0,
+          "blur": 8,
+          "spread": 0,
+          "color": "rgba(32, 128, 77, 0.3)"
+        }
+      },
+      "violet": {
+        "sm": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 10,
+            "spread": 0,
+            "color": "rgba(167, 37, 255, 0.3)"
+          }
+        },
+        "md": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 0,
+            "blur": 15,
+            "spread": 0,
+            "color": "rgba(167, 37, 255, 0.5)"
+          }
+        }
+      },
+      "error": {
+        "$type": "shadow",
+        "$value": {
+          "x": 0,
+          "y": 0,
+          "blur": 8,
+          "spread": 0,
+          "color": "rgba(198, 40, 40, 0.3)"
+        }
       }
     },
     "sheet": {
@@ -76,6 +134,26 @@
         "x": 0,
         "y": -4,
         "blur": 30,
+        "spread": 0,
+        "color": "rgba(0, 0, 0, 0.15)"
+      }
+    },
+    "card": {
+      "$type": "shadow",
+      "$value": {
+        "x": 0,
+        "y": 2,
+        "blur": 4,
+        "spread": 0,
+        "color": "rgba(0, 0, 0, 0.04)"
+      }
+    },
+    "modal": {
+      "$type": "shadow",
+      "$value": {
+        "x": 0,
+        "y": 4,
+        "blur": 12,
         "spread": 0,
         "color": "rgba(0, 0, 0, 0.15)"
       }

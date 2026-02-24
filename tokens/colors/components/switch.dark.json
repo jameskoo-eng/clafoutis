@@ -1,0 +1,44 @@
+{
+  "color": {
+    "switch": {
+      "track": {
+        "bgOff": {
+          "$type": "color",
+          "$value": "{color.switch.off}"
+        },
+        "bgOn": {
+          "$type": "color",
+          "$value": "{color.brand.primary}"
+        }
+      },
+      "thumb": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.palette.cream.100}"
+        }
+      },
+      "hover": {
+        "track": {
+          "$type": "color",
+          "$value": "{color.palette.ink.700}"
+        }
+      },
+      "focus": {
+        "ring": {
+          "$type": "color",
+          "$value": "{color.ring.primary}"
+        }
+      },
+      "disabled": {
+        "track": {
+          "$type": "color",
+          "$value": "{color.state.disabled.bg}"
+        },
+        "thumb": {
+          "$type": "color",
+          "$value": "{color.palette.gray.800}"
+        }
+      }
+    }
+  }
+}
