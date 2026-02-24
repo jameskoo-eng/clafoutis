@@ -1,0 +1,315 @@
+/* Base styles and utilities. References design token CSS custom properties (--font-body, --text-2xl, etc.) generated from token JSON. */
+
+@layer base {
+  *:focus-visible {
+    @apply outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  /* Inside cards: headings use body font (Noi Grotesk), not National */
+  [data-slot="card"],
+  .bg-card {
+    --font-heading: var(--font-body);
+  }
+}
+
+@layer utilities {
+  /* Screen-reader-only utility missing from Tailwind v4 generated CSS */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  /* Utility: hide outlines where they conflict with decorative borders */
+  .outline-hidden {
+    outline-style: hidden;
+  }
+  .rounded-16 {
+    border-radius: var(--radius-chip);
+  }
+  /* 10% tint using current background color */
+  .bg-background-10 {
+    background-color: color-mix(in oklab, var(--background) 10%, transparent);
+  }
+  /* Mask utility: horizontal edge fade using luminance mask (no visible overlay) */
+  .mask-fade-x-24 {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--space-section-gap),
+      #000 calc(100% - var(--space-section-gap)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--space-section-gap),
+      #000 calc(100% - var(--space-section-gap)),
+      transparent 100%
+    );
+  }
+  /* Premium marquee utilities */
+  .marquee {
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: flex;
+    will-change: transform;
+    animation: marquee-left var(--marquee-duration, 45000ms) linear infinite;
+  }
+  .marquee-pause:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation-play-state: paused;
+    }
+  }
+  /* Right edge only fade (left stays hard). 24px softness */
+  .mask-fade-right-24 {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(100% - var(--space-section-gap)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(100% - var(--space-section-gap)),
+      transparent 100%
+    );
+  }
+  /* Display typography utilities to ensure large headings exist at build time */
+  .text-display-1 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-display-tight);
+  }
+  .text-display-2 {
+    font-size: var(--text-display-lg);
+    line-height: var(--leading-display-tight);
+  }
+  .text-quote-lg {
+    font-size: var(--text-quote-lg);
+    line-height: 1.25;
+  }
+  .text-quote-xl {
+    font-size: var(--text-quote-xl);
+    line-height: 1.2;
+  }
+  /* Ensure the input border color class exists in the build output */
+  .border-input-border {
+    border-color: var(--input-border);
+  }
+  .focus-visible\:border-input-border:focus-visible {
+    border-color: var(--input-border);
+  }
+  /* Use darker red for error borders on invalid inputs */
+  .aria-invalid\:border-destructive[aria-invalid="true"] {
+    border-color: var(--destructive-foreground);
+  }
+  /* Typography utility: body font (Noi Grotesk) */
+  .font-noi {
+    font-family: var(--font-body);
+  }
+  /* Typography utility: display/heading font (National 2 Condensed) — use only outside cards */
+  .font-national {
+    font-family: var(--font-display);
+  }
+  /* Typography utility: label weight (bold); used by Label and form labels */
+  .font-label {
+    font-weight: var(--font-weight-label);
+  }
+  /* Typography utility: ensure semibold weight token is available */
+  .font-semibold {
+    font-weight: var(--font-weight-semibold);
+  }
+  /* Typography utility: bold weight */
+  .font-bold {
+    font-weight: var(--font-weight-bold);
+  }
+  /* Typography utility: label font-size (14px) for Label component */
+  .text-label {
+    font-size: var(--text-label);
+  }
+  /* Typography utility: 10px for eyebrow/small labels (--text-2xs) */
+  .text-2xs {
+    font-size: var(--text-2xs);
+    line-height: 1;
+  }
+  /* Letter-spacing for eyebrow / small uppercase labels */
+  .tracking-eyebrow {
+    letter-spacing: var(--tracking-eyebrow);
+  }
+  /* Typography utility: ensure 20px text size token is available */
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: 1.5;
+  }
+  .italic {
+    font-style: italic;
+  }
+
+  /* Warning toast: black text (--warning-text) but yellow icon to match design */
+  .toaster [data-type="warning"] [data-icon],
+  .toaster [data-type="warning"] svg {
+    color: var(--warning);
+    fill: var(--warning);
+  }
+
+  /* Crossfade utilities (ensure available regardless of Tailwind pruning) */
+  .opacity-0 {
+    opacity: 0;
+  }
+  .opacity-100 {
+    opacity: 1;
+  }
+  .transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: ease;
+    transition-duration: 300ms;
+  }
+  .duration-300 {
+    transition-duration: 300ms;
+  }
+  .duration-review-enter {
+    transition-duration: var(--duration-review-enter);
+  }
+
+  /* Typography utilities for Figma hero treatment */
+  .text-40 {
+    font-size: var(--text-quote-xl);
+    line-height: 1.1;
+  }
+  .text-48 {
+    font-size: var(--text-display-xl);
+    line-height: 1.1;
+  }
+  .text-64 {
+    font-size: var(--text-2xl);
+  }
+  .leading-60 {
+    line-height: 60px;
+  }
+  .leading-105 {
+    line-height: 1.05;
+  }
+  .leading-110 {
+    line-height: 1.1;
+  }
+
+  /* Responsive variants matching Tailwind semantics */
+  @media (width >= 40rem) {
+    .sm\:text-48 {
+      font-size: var(--text-display-xl);
+      line-height: 1.1;
+    }
+  }
+  @media (width >= 48rem) {
+    .md\:text-display-1 {
+      font-size: var(--text-2xl);
+      line-height: 1.05;
+    }
+    .md\:text-display-2 {
+      font-size: var(--text-display-lg);
+      line-height: 1.05;
+    }
+    .md\:text-64 {
+      font-size: var(--text-2xl);
+    }
+    .md\:leading-60 {
+      line-height: 60px;
+    }
+  }
+}
+
+/**
+ * Base typography. Uses --font-heading (National outside cards, body inside [data-slot="card"] / .bg-card).
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-family: var(--font-heading);
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.25;
+      font-style: normal;
+      margin-bottom: 0; /* Normalize: headings have no default spacing; use container spacing */
+    }
+
+    h1 em {
+      font-style: italic;
+    }
+
+    h2 {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--leading-body);
+    }
+
+    h3 {
+      font-family: var(--font-body);
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--leading-body);
+    }
+
+    h4 {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--leading-body);
+    }
+
+    p {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--leading-body);
+    }
+
+    p a {
+      text-decoration: underline;
+    }
+
+    label {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-label);
+      line-height: var(--leading-body);
+    }
+
+    button {
+      font-family: var(--font-body);
+      font-size: var(--text-button);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--leading-body);
+    }
+
+    input {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--leading-body);
+    }
+  }
+}

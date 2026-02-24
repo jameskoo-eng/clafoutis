@@ -213,11 +213,11 @@ turbo-clean:
 pre-commit:
 	@echo "Running pre-commit checks..."
 	@echo "→ Checking linting..."
-	@$(ENV_LOADER) && pnpm turbo lint:check || { echo "✗ Linting failed. Please fix the errors and try again."; exit 1; }
+	@pnpm turbo lint:check || { echo "✗ Linting failed. Please fix the errors and try again."; exit 1; }
 	@echo "→ Checking types..."
-	@$(ENV_LOADER) && pnpm turbo type-check || { echo "✗ Type checking failed. Please fix the errors and try again."; exit 1; }
+	@pnpm turbo type-check || { echo "✗ Type checking failed. Please fix the errors and try again."; exit 1; }
 	@echo "→ Checking formatting..."
-	@$(ENV_LOADER) && pnpm turbo format:check || { echo "✗ Formatting check failed. Run 'make fix-all' to fix formatting."; exit 1; }
+	@pnpm turbo format:check || { echo "✗ Formatting check failed. Run 'make fix-all' to fix formatting."; exit 1; }
 	@echo "✓ All pre-commit checks passed!"
 .PHONY: pre-commit
 
