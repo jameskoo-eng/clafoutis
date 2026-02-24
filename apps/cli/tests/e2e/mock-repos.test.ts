@@ -32,10 +32,11 @@ describe('E2E: mock-design-system → mock-frontend', () => {
   });
 
   it('syncs latest release from mock-design-system', async () => {
-    // Create consumer config
+    // Create consumer config - use pinned version for deterministic tests
+    // (the external repo's "latest" may not always have assets)
     const config = {
       repo: MOCK_DESIGN_SYSTEM_REPO,
-      version: 'latest',
+      version: PINNED_VERSION,
       files: {
         'tailwind.base.css': 'src/styles/base.css',
         'tailwind.tailwind.base.js': 'tailwind.tokens.js',
