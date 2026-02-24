@@ -57,7 +57,10 @@ describe('Token pipeline integration', () => {
     const files = loadTokenDir(tokensDir);
     const store = createTokenStore();
     store.getState().loadTokens(files);
-    store.getState().addToken('test.roundtrip', 'color', '#FF0000', Object.keys(files)[0]);
+    // Use a non-theme base file (not .dark.json) so the token resolves in light theme
+    const baseFile = Object.keys(files).find((k) => !k.includes('.dark.') && k.endsWith('.json'));
+    if (!baseFile) return;
+    store.getState().addToken('test.roundtrip', 'color', '#FF0000', baseFile);
     const exported = exportTokens(store.getState().tokenFiles);
     const store2 = createTokenStore();
     store2.getState().loadTokens(exported);
