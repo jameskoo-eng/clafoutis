@@ -1,0 +1,152 @@
+{
+  "colors": {
+    "background": {
+      "$type": "color",
+      "$value": "{colors.ink.900}"
+    },
+    "foreground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "card": {
+      "$type": "color",
+      "$value": "{colors.ink.800}"
+    },
+    "cardForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "popover": {
+      "$type": "color",
+      "$value": "{colors.ink.800}"
+    },
+    "popoverForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "primary": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "primaryForeground": {
+      "$type": "color",
+      "$value": "{colors.ink.900}"
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "secondaryForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "muted": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "mutedForeground": {
+      "$type": "color",
+      "$value": "{colors.gray.700}"
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "{colors.pink.500}"
+    },
+    "accentForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "destructive": {
+      "$type": "color",
+      "$value": "{colors.red.600}"
+    },
+    "destructiveForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "border": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "borderLight": {
+      "$type": "color",
+      "$value": "rgba(254, 247, 231, 0.12)"
+    },
+    "input": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "ring": {
+      "$type": "color",
+      "$value": "{colors.pink.500}"
+    },
+    "sidebar": {
+      "$type": "color",
+      "$value": "{colors.ink.800}"
+    },
+    "sidebarForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "sidebarPrimary": {
+      "$type": "color",
+      "$value": "{colors.pink.500}"
+    },
+    "sidebarPrimaryForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "sidebarAccent": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "sidebarAccentForeground": {
+      "$type": "color",
+      "$value": "{colors.cream.100}"
+    },
+    "sidebarBorder": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "sidebarRing": {
+      "$type": "color",
+      "$value": "{colors.pink.500}"
+    },
+    "infoSurface": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    },
+    "infoBorder": {
+      "$type": "color",
+      "$value": "rgba(254, 247, 231, 0.18)"
+    },
+    "infoText": {
+      "$type": "color",
+      "$value": "{colors.gray.700}"
+    },
+    "purpleSurface": {
+      "$type": "color",
+      "$value": "rgba(167, 37, 255, 0.1)"
+    },
+    "emptyStateIconBg": {
+      "$type": "color",
+      "$value": "#f5d9ed"
+    },
+    "violetSurface": {
+      "$type": "color",
+      "$value": "#2d1f4d"
+    },
+    "violetSurfaceBorder": {
+      "$type": "color",
+      "$value": "{colors.violet.500}"
+    },
+    "violetIconBg": {
+      "$type": "color",
+      "$value": "#3d2960"
+    },
+    "borderMuted": {
+      "$type": "color",
+      "$value": "{colors.gray.800}"
+    }
+  }
+}

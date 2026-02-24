@@ -1,0 +1,272 @@
+{
+  "spacing": {
+    "1": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "5": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "10": {
+      "$type": "dimension",
+      "$value": "40px"
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "layoutGutter": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "layoutGutterSm": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "layoutGutterLg": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "sectionGap": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "controlGap": {
+      "$type": "dimension",
+      "$value": "6px"
+    },
+    "formHorizontal": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "chipPaddingX": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "chipPaddingY": {
+      "$type": "dimension",
+      "$value": "10px"
+    },
+    "authCardPadding": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "authCardBlockGap": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "authStackGap": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "authStackGapTight": {
+      "$type": "dimension",
+      "$value": "6px"
+    },
+    "authHelperMarginTop": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "authLoaderPaddingY": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "authHelperMinHeight": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "authInlineGap": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "authInlineGapLg": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "authSurfacePadding": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "authControlHeight": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "onboardingContentY": {
+      "$type": "dimension",
+      "$value": "40px"
+    },
+    "onboardingReviewBottom": {
+      "$type": "dimension",
+      "$value": "80px"
+    },
+    "onboardingNavOffset": {
+      "$type": "dimension",
+      "$value": "240px"
+    },
+    "iconSm": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "iconMd": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "iconLg": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "iconOffset": {
+      "$type": "dimension",
+      "$value": "2px"
+    },
+    "spinner": {
+      "$type": "dimension",
+      "$value": "64px"
+    },
+    "authShellX": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "authShellXSm": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "authShellXLg": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "authShellPt": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "authShellPtSm": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "authShellPb": {
+      "$type": "dimension",
+      "$value": "40px"
+    },
+    "authShellPbSm": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "authShellGap": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "authShellGapXl": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "authInlineGapXs": {
+      "$type": "dimension",
+      "$value": "4px"
+    }
+  },
+  "borderRadius": {
+    "default": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "button": {
+      "$type": "dimension",
+      "$value": "28px"
+    },
+    "card": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "input": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "chip": {
+      "$type": "dimension",
+      "$value": "16px"
+    }
+  },
+  "sizing": {
+    "pageShell": {
+      "$type": "dimension",
+      "$value": "1400px"
+    },
+    "authForm": {
+      "$type": "dimension",
+      "$value": "27.8125rem"
+    },
+    "authShell": {
+      "$type": "dimension",
+      "$value": "1400px"
+    },
+    "adstrengthTriggerHeight": {
+      "$type": "dimension",
+      "$value": "55px"
+    },
+    "adstrengthTriggerWidth": {
+      "$type": "dimension",
+      "$value": "260px"
+    },
+    "adstrengthTriggerWidthSm": {
+      "$type": "dimension",
+      "$value": "300px"
+    },
+    "adstrengthBarHeight": {
+      "$type": "dimension",
+      "$value": "28px"
+    },
+    "adstrengthBarWidth": {
+      "$type": "dimension",
+      "$value": "10px"
+    }
+  },
+  "duration": {
+    "fast": {
+      "$type": "duration",
+      "$value": "200ms"
+    },
+    "normal": {
+      "$type": "duration",
+      "$value": "300ms"
+    },
+    "slow": {
+      "$type": "duration",
+      "$value": "500ms"
+    },
+    "reviewEnter": {
+      "$type": "duration",
+      "$value": "500ms"
+    },
+    "authStatus": {
+      "$type": "duration",
+      "$value": "200ms"
+    }
+  },
+  "borderWidth": {
+    "strong": {
+      "$type": "dimension",
+      "$value": "4px"
+    }
+  }
+}
