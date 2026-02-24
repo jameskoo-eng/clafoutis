@@ -1,0 +1,54 @@
+{
+  "color": {
+    "sidebar": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.sidebar.bg}"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sidebar.border}"
+      },
+      "text": {
+        "$type": "color",
+        "$value": "{color.sidebar.foreground}"
+      },
+      "item": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.sidebar.foreground}"
+        },
+        "icon": {
+          "$type": "color",
+          "$value": "{color.sidebar.foreground}"
+        }
+      },
+      "itemHover": {
+        "bg": {
+          "$type": "color",
+          "$value": "rgba(25, 2, 56, 0.05)"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.sidebar.foreground}"
+        }
+      },
+      "itemActive": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.sidebar.accent}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.sidebar.accentForeground}"
+        }
+      },
+      "groupLabel": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.secondary}"
+        }
+      }
+    }
+  }
+}

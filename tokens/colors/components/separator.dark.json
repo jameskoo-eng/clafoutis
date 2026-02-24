@@ -1,0 +1,10 @@
+{
+  "color": {
+    "separator": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.border.primary}"
+      }
+    }
+  }
+}

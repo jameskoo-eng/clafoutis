@@ -1,0 +1,64 @@
+{
+  "color": {
+    "navigation": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.sidebar.bg}"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sidebar.border}"
+      },
+      "item": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.sidebar.foreground}"
+        },
+        "icon": {
+          "$type": "color",
+          "$value": "{color.sidebar.foreground}"
+        }
+      },
+      "itemHover": {
+        "bg": {
+          "$type": "color",
+          "$value": "rgba(25, 2, 56, 0.05)"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.sidebar.foreground}"
+        }
+      },
+      "itemActive": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.navigation.activeBg}"
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.navigation.activeBorder}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.navigation.activeForeground}"
+        }
+      },
+      "userSection": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.navigation.userBg}"
+        }
+      },
+      "userAvatar": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.navigation.userAvatarBg}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.navigation.userAvatarFg}"
+        }
+      }
+    }
+  }
+}

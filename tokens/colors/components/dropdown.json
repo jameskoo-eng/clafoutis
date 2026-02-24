@@ -1,0 +1,90 @@
+{
+  "color": {
+    "dropdown": {
+      "trigger": {
+        "bg": {
+          "$type": "color",
+          "$value": "transparent"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        },
+        "icon": {
+          "$type": "color",
+          "$value": "{color.icon.muted}"
+        }
+      },
+      "content": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.surface.primary}"
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.border.primary}"
+        },
+        "shadow": {
+          "$type": "shadow",
+          "$value": {
+            "x": 0,
+            "y": 4,
+            "blur": 12,
+            "spread": 0,
+            "color": "rgba(0, 0, 0, 0.15)"
+          }
+        }
+      },
+      "item": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        },
+        "icon": {
+          "$type": "color",
+          "$value": "{color.icon.primary}"
+        },
+        "shortcut": {
+          "$type": "color",
+          "$value": "{color.text.secondary}"
+        }
+      },
+      "itemHover": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.palette.gray.50}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      },
+      "itemActive": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.palette.gray.100}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      },
+      "separator": {
+        "$type": "color",
+        "$value": "{color.border.muted}"
+      },
+      "label": {
+        "$type": "color",
+        "$value": "{color.text.secondary}"
+      },
+      "disabled": {
+        "$type": "color",
+        "$value": "{color.state.disabled.text}"
+      },
+      "submenuArrow": {
+        "$type": "color",
+        "$value": "{color.icon.muted}"
+      }
+    }
+  }
+}

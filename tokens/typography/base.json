@@ -1,116 +1,128 @@
 {
-  "fontSize": {
-    "base": {
-      "$type": "dimension",
-      "$value": "16px"
+  "typography": {
+    "font": {
+      "family": {
+        "base": {
+          "$type": "fontFamily",
+          "$value": "Noi Grotesk, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
+        },
+        "heading": {
+          "$type": "fontFamily",
+          "$value": "National 2 Condensed, sans-serif"
+        },
+        "display": {
+          "$type": "fontFamily",
+          "$value": "National 2 Condensed, sans-serif"
+        },
+        "mono": {
+          "$type": "fontFamily",
+          "$value": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+        }
+      },
+      "size": {
+        "2xs": {
+          "$type": "dimension",
+          "$value": "10px"
+        },
+        "xs": {
+          "$type": "dimension",
+          "$value": "12px"
+        },
+        "sm": {
+          "$type": "dimension",
+          "$value": "14px"
+        },
+        "base": {
+          "$type": "dimension",
+          "$value": "16px"
+        },
+        "lg": {
+          "$type": "dimension",
+          "$value": "20px"
+        },
+        "xl": {
+          "$type": "dimension",
+          "$value": "24px"
+        },
+        "2xl": {
+          "$type": "dimension",
+          "$value": "60px"
+        },
+        "quoteLg": {
+          "$type": "dimension",
+          "$value": "32px"
+        },
+        "quoteXl": {
+          "$type": "dimension",
+          "$value": "40px"
+        },
+        "displayLg": {
+          "$type": "dimension",
+          "$value": "44px"
+        },
+        "displayXl": {
+          "$type": "dimension",
+          "$value": "48px"
+        }
+      },
+      "weight": {
+        "normal": {
+          "$type": "fontWeight",
+          "$value": 400
+        },
+        "medium": {
+          "$type": "fontWeight",
+          "$value": 500
+        },
+        "semibold": {
+          "$type": "fontWeight",
+          "$value": 600
+        },
+        "bold": {
+          "$type": "fontWeight",
+          "$value": 700
+        },
+        "label": {
+          "$type": "fontWeight",
+          "$value": 600
+        }
+      }
     },
-    "2xl": {
-      "$type": "dimension",
-      "$value": "60px"
+    "line": {
+      "height": {
+        "tight": {
+          "$type": "number",
+          "$value": 1.05
+        },
+        "display": {
+          "$type": "number",
+          "$value": 1.1
+        },
+        "quote": {
+          "$type": "number",
+          "$value": 1.35
+        },
+        "normal": {
+          "$type": "number",
+          "$value": 1.5
+        }
+      }
     },
-    "displayXl": {
-      "$type": "dimension",
-      "$value": "48px"
-    },
-    "displayLg": {
-      "$type": "dimension",
-      "$value": "44px"
-    },
-    "quoteXl": {
-      "$type": "dimension",
-      "$value": "40px"
-    },
-    "quoteLg": {
-      "$type": "dimension",
-      "$value": "32px"
-    },
-    "xl": {
-      "$type": "dimension",
-      "$value": "24px"
-    },
-    "lg": {
-      "$type": "dimension",
-      "$value": "20px"
-    },
-    "button": {
-      "$type": "dimension",
-      "$value": "14px"
-    },
-    "sm": {
-      "$type": "dimension",
-      "$value": "14px"
-    },
-    "label": {
-      "$type": "dimension",
-      "$value": "14px"
-    },
-    "xs": {
-      "$type": "dimension",
-      "$value": "12px"
-    },
-    "2xs": {
-      "$type": "dimension",
-      "$value": "10px"
-    }
-  },
-  "fontFamily": {
-    "body": {
-      "$type": "fontFamily",
-      "$value": "\"Noi Grotesk\", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, \"Noto Sans\", sans-serif"
-    },
-    "display": {
-      "$type": "fontFamily",
-      "$value": "\"National 2 Condensed\", sans-serif"
-    },
-    "heading": {
-      "$type": "fontFamily",
-      "$value": "\"National 2 Condensed\", sans-serif"
-    }
-  },
-  "lineHeight": {
-    "displayTight": {
-      "$type": "number",
-      "$value": "1.05"
-    },
-    "display": {
-      "$type": "number",
-      "$value": "1.1"
-    },
-    "quote": {
-      "$type": "number",
-      "$value": "1.35"
-    },
-    "body": {
-      "$type": "number",
-      "$value": "1.5"
-    }
-  },
-  "letterSpacing": {
-    "eyebrow": {
-      "$type": "dimension",
-      "$value": "0.18em"
-    }
-  },
-  "fontWeight": {
-    "label": {
-      "$type": "fontWeight",
-      "$value": "600"
-    },
-    "bold": {
-      "$type": "fontWeight",
-      "$value": "700"
-    },
-    "semibold": {
-      "$type": "fontWeight",
-      "$value": "600"
-    },
-    "medium": {
-      "$type": "fontWeight",
-      "$value": "500"
-    },
-    "normal": {
-      "$type": "fontWeight",
-      "$value": "400"
+    "letter": {
+      "spacing": {
+        "normal": {
+          "$type": "dimension",
+          "$value": "0em"
+        },
+        "narrow": {
+          "$type": "dimension",
+          "$value": "-0.5px"
+        },
+        "wide": {
+          "$type": "dimension",
+          "$value": "0.18em"
+        }
+      }
     }
   }
 }

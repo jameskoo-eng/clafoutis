@@ -1,0 +1,64 @@
+{
+  "color": {
+    "toggle": {
+      "bg": {
+        "$type": "color",
+        "$value": "transparent"
+      },
+      "text": {
+        "$type": "color",
+        "$value": "{color.text.primary}"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "transparent"
+      },
+      "hover": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.state.ghost.hover}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      },
+      "pressed": {
+        "bg": {
+          "$type": "color",
+          "$value": "rgba(254, 247, 231, 0.12)"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      },
+      "selected": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.brand.primary}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.brand.primaryForeground}"
+        }
+      },
+      "disabled": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.state.disabled.bg}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.state.disabled.text}"
+        }
+      },
+      "focus": {
+        "ring": {
+          "$type": "color",
+          "$value": "{color.ring.primary}"
+        }
+      }
+    }
+  }
+}

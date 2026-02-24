@@ -1,0 +1,54 @@
+{
+  "color": {
+    "table": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.surface.primary}"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.border.primary}"
+      },
+      "header": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.surface.tertiary}"
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.border.primary}"
+        }
+      },
+      "cell": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.primary}"
+        }
+      },
+      "row": {
+        "hover": {
+          "bg": {
+            "$type": "color",
+            "$value": "{color.palette.ink.700}"
+          }
+        },
+        "selected": {
+          "bg": {
+            "$type": "color",
+            "$value": "{color.palette.ink.600}"
+          }
+        }
+      },
+      "caption": {
+        "text": {
+          "$type": "color",
+          "$value": "{color.text.secondary}"
+        }
+      }
+    }
+  }
+}
